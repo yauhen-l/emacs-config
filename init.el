@@ -2,23 +2,15 @@
 ;;; Code:
 ;;; Commentary:
 
-(defadvice rgrep (around rgrep-init)
-	"Init grep defaults before calling rgrep non-interactively."
-	(when (not (called-interactively-p))
-		(grep-compute-defaults))
-	ad-do-it)
-
-(ad-activate 'rgrep)
-
 (defalias 'yes-or-no-p 'y-or-n-p)
 
-(require 'package) ;; You might already have this line
+(require 'package)
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/"))
 (when (< emacs-major-version 24)
   ;; For important compatibility libraries like cl-lib
   (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
-(package-initialize) ;; You might already have this line
+(package-initialize)
 
 (add-to-list 'load-path "~/Misc/emacs/go-mode.el/")
 (add-to-list 'load-path "~/Misc/emacs/emacs-go-eldoc/")
@@ -28,45 +20,32 @@
 (add-hook 'before-save-hook 'gofmt-before-save)
 (add-hook 'go-mode-hook (lambda ()
                           (local-set-key (kbd "C-c C-r") 'go-remove-unused-imports)
-			  (local-set-key (kbd "C-c o") 'godoc-at-point))
-	  )
+													(local-set-key (kbd "C-c o") 'godoc-at-point)))
 
-(defun grep-in-project (regexp)
-	"Run grep REGEXP in ~/ws/src/junoalb.net."
-	(interactive "s")
-	(rgrep regexp "*.go" "~/ws/src/junolab.net/"))
 (global-set-key (kbd "C-c C-g") 'search-in-project)
 
 (global-set-key (kbd "C-c C-f") '(lambda()
 				   (interactive)
-				   (helm-do-ag "~/ws/src/junolab.net/")))
+				   (helm-do-ag "$GOPATH/src/junolab.net/")))
 (global-set-key (kbd "C-c f") 'helm-do-ag)
 (global-set-key (kbd "s-b") '(lambda()
-			       (interactive)
-			       (projectile-with-default-dir (projectile-project-root)
-				 (shell-command "gb build"))
-			       ))
+															 (interactive)
+															 (projectile-with-default-dir (projectile-project-root)
+																 (shell-command "gb build"))))
 
-;;(add-to-list 'load-path "~/ws/src/github.com/dougm/goflymake/")
-(add-to-list 'load-path "~/ws/src/github.com/nsf/gocode/emacs/")
-(add-to-list 'load-path (concat (getenv "GOPATH")  "/src/github.com/golang/lint/misc/emacs"))
+(add-to-list 'load-path "$GOPATH/src/github.com/nsf/gocode/emacs/")
 
 (load-file "$GOPATH/src/golang.org/x/tools/cmd/oracle/oracle.el")
 (load-file "$GOPATH/src/golang.org/x/tools/refactor/rename/go-rename.el")
 
-;;(require 'go-flymake)
-;;(require 'go-flycheck)
 (add-hook 'after-init-hook #'global-flycheck-mode)
 (require 'go-autocomplete)
 (require 'auto-complete-config)
-;(require 'golint)
 (require 'go-eldoc)
 (add-hook 'go-mode-hook 'go-eldoc-setup)
 (require 'flycheck-tip)
 (flycheck-tip-use-timer 'verbose)
-(set-face-attribute 'eldoc-highlight-function-argument nil
-                    :underline nil :foreground "red"
-                    :weight 'bold)
+(set-face-attribute 'eldoc-highlight-function-argument nil :underline nil :foreground "red" :weight 'bold)
 
 (setq-default flycheck-disabled-checkers '(go-vet go-golint))
 (set-face-attribute 'flycheck-error nil :underline (list :color "red" :style 'wave) :foreground nil :background nil)
@@ -138,7 +117,7 @@
 
 (global-set-key (kbd "s-w") 'mark-a-word-or-thing)
 
-(global-set-key "\C-c\C-c" "\C-a\C- \C-n\M-w\C-y")
+(global-set-key (kbd "C-c C-c") "\C-a\C- \C-n\M-w\C-y")
 (global-set-key (kbd "s-l") (kbd "C-c ! l"))
 (global-set-key (kbd "<s-down>") (kbd "C-c ! n"))
 (global-set-key (kbd "<s-up>") (kbd "C-c ! p"))
@@ -198,8 +177,6 @@
 (require 'golden-ratio)
 (golden-ratio-mode 1)
 
-;(eval-after-load "sql" '(load-library "sql-indent"))
-
 (global-set-key (kbd "S-s-<left>") '(lambda ()
 				      (interactive)
 				      (shrink-window-horizontally 10)))
@@ -228,8 +205,6 @@
           (rename-file filename new-name t)
           (set-visited-file-name new-name t t)))))))
 
-(global-set-key (kbd "s-<f2>") 'rename-file-and-buffer)
-
 (defun xah-new-empty-buffer ()
   "Open a new empty buffer.
 URL `http://ergoemacs.org/emacs/emacs_new_empty_buffer.html'
@@ -242,6 +217,9 @@ Version 2015-06-12"
 
 (global-set-key (kbd "s-n") 'xah-new-empty-buffer)
 
+(global-set-key (kbd "s-I") 'utl-imenus-search-project-go-files)
+(global-set-key (kbd "s-i") 'imenus)
+
 (require 'find-lisp)
 (require 'imenus)
 
@@ -252,8 +230,5 @@ Version 2015-06-12"
 	(files (delq nil (mapcar (lambda (filename) (if (string= "go" (file-name-extension filename)) filename nil)) (projectile-current-project-files)))))
     (imenus-files files nil "Search in project:")))
 
-(global-set-key (kbd "s-I") 'utl-imenus-search-project-go-files)
-(global-set-key (kbd "s-i") 'imenus)
-
-(provide '.emacs)
-;;; .emacs ends here
+(provide 'init)
+;;; init.el ends here

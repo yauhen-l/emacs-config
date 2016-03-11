@@ -18,20 +18,26 @@
 (require 'go-mode-autoloads)
 
 (add-hook 'before-save-hook 'gofmt-before-save)
+
+(defun run-in-project(command)
+	(interactive)
+	(projectile-with-default-dir (projectile-project-root)
+		(shell-command command)))
+
 (add-hook 'go-mode-hook (lambda ()
                           (local-set-key (kbd "C-c C-r") 'go-remove-unused-imports)
-													(local-set-key (kbd "C-c o") 'godoc-at-point)))
+													(local-set-key (kbd "C-c o") 'godoc-at-point)
+													(local-set-key (kbd "C-c g u") '(run-in-project "goose up"))
+													(local-set-key (kbd "C-c g d") '(run-in-project "goose down"))
+													(local-set-key (kbd "s-b") '(run-in-project "gb build"))
+													))
 
 (global-set-key (kbd "C-c C-g") 'search-in-project)
 
 (global-set-key (kbd "C-c C-f") '(lambda()
-				   (interactive)
-				   (helm-do-ag "$GOPATH/src/junolab.net/")))
+																	 (interactive)
+																	 (helm-do-ag "$GOPATH/src/junolab.net/")))
 (global-set-key (kbd "C-c f") 'helm-do-ag)
-(global-set-key (kbd "s-b") '(lambda()
-															 (interactive)
-															 (projectile-with-default-dir (projectile-project-root)
-																 (shell-command "gb build"))))
 
 (add-to-list 'load-path "$GOPATH/src/github.com/nsf/gocode/emacs/")
 
@@ -87,7 +93,6 @@
  '(sr-speedbar-width 20 t)
  '(tool-bar-mode nil))
 
-;(sr-speedbar-open)
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -137,8 +142,6 @@
 (global-set-key (kbd "C-x C-f") 'helm-find-files)
 (helm-mode 1)
 
-;(require 'projectile-speedbar)
-;(global-set-key (kbd "M-<f3>") 'projectile-speedbar-open-current-buffer-in-tree)
 
 (add-hook 'json-mode 'flymake-json-load)
 (add-hook 'js-mode-hook 'flymake-json-maybe-load)
@@ -146,13 +149,6 @@
 (setq make-backup-files nil)
 (setq auto-save-default nil)
 
-;(add-hook 'python-mode-hook 'jedi:setup)
-;(setq jedi:complete-on-dot t)
-;(add-hook 'ein:connect-mode-hook 'ein:jedi-setup)
-;(add-hook 'python-mode-hook 'anaconda-mode)
-;(add-hook 'python-mode-hook 'guess-style-guess-tabs-mode)
-;   (add-hook 'python-mode-hook (lambda ()
-;                                    (guess-style-guess-tab-width)))
 (package-initialize)
 (elpy-enable)
 
@@ -177,14 +173,14 @@
 (require 'golden-ratio)
 (golden-ratio-mode 1)
 
-(global-set-key (kbd "S-s-<left>") '(lambda ()
-				      (interactive)
-				      (shrink-window-horizontally 10)))
-(global-set-key (kbd "S-s-<right>") '(lambda ()
-				       (interactive)
-				       (enlarge-window-horizontally 10)))
-(global-set-key (kbd "S-s-<down>") 'shrink-window)
-(global-set-key (kbd "S-s-<up>") 'enlarge-window)
+;(global-set-key (kbd "S-s-<left>") '(lambda ()
+;				      (interactive)
+;				      (shrink-window-horizontally 10)))
+;(global-set-key (kbd "S-s-<right>") '(lambda ()
+;				       (interactive)
+;				       (enlarge-window-horizontally 10)))
+;(global-set-key (kbd "S-s-<down>") 'shrink-window)
+;(global-set-key (kbd "S-s-<up>") 'enlarge-window)
 
 
 (add-to-list 'yas-snippet-dirs "~/Misc/emacs/yasnippet-go")

@@ -20,23 +20,51 @@
 (add-hook 'before-save-hook 'gofmt-before-save)
 
 (defun run-in-project(command)
-	(interactive)
+	(interactive "s")
 	(projectile-with-default-dir (projectile-project-root)
 		(shell-command command)))
+
+(defun gb-build-project()
+	(interactive)
+	(run-in-project "gb build"))
+
+(defun goose-up-project()
+	(interactive)
+	(run-in-project "goose up"))
+
+(defun goose-down-project()
+	(interactive)
+	(run-in-project "goose down"))
+
+(defun go-run-file()
+	(interactive)
+	(shell-command (concat "go run " (buffer-file-name))))
+
+
+(defun go-local-playground()
+	(interactive)
+	(let ((tmp-go-file (concat "/tmp/"
+														 (replace-regexp-in-string "\\." "playground\/" (number-to-string (float-time)))
+														 ".go")))
+		(let ((dir (file-name-directory tmp-go-file)))
+			(make-directory dir)
+			(copy-file "~/.emacs.d/gotmpl.go" tmp-go-file)
+			(find-file tmp-go-file))))
 
 (add-hook 'go-mode-hook (lambda ()
                           (local-set-key (kbd "C-c C-r") 'go-remove-unused-imports)
 													(local-set-key (kbd "C-c o") 'godoc-at-point)
-													(local-set-key (kbd "C-c g u") '(run-in-project "goose up"))
-													(local-set-key (kbd "C-c g d") '(run-in-project "goose down"))
-													(local-set-key (kbd "s-b") '(run-in-project "gb build"))
+													(local-set-key (kbd "C-c r") 'go-run-file)
 													))
 
-(global-set-key (kbd "C-c C-g") 'search-in-project)
+(global-set-key (kbd "C-c g u") 'goose-up-project)
+(global-set-key (kbd "C-c g d") 'goose-down-project)
+(global-set-key (kbd "s-b") 'gb-build-project)
+(global-set-key (kbd "s-p") 'go-local-playground)
 
 (global-set-key (kbd "C-c C-f") '(lambda()
 																	 (interactive)
-																	 (helm-do-ag "$GOPATH/src/junolab.net/")))
+																	 (helm-do-ag "/home/yauhen/ws/src/junolab.net/")))
 (global-set-key (kbd "C-c f") 'helm-do-ag)
 
 (add-to-list 'load-path "$GOPATH/src/github.com/nsf/gocode/emacs/")
@@ -212,6 +240,7 @@ Version 2015-06-12"
     (setq buffer-offer-save t)))
 
 (global-set-key (kbd "s-n") 'xah-new-empty-buffer)
+(global-set-key (kbd "s-<f2>") 'rename-file-and-buffer)
 
 (global-set-key (kbd "s-I") 'utl-imenus-search-project-go-files)
 (global-set-key (kbd "s-i") 'imenus)

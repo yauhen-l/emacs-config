@@ -19,6 +19,15 @@
 
 (add-hook 'before-save-hook 'gofmt-before-save)
 
+(defvar init-GOPATH (getenv "GOPATH"))
+
+(defun go-package-name(file)
+	(replace-regexp-in-string (concat init-GOPATH "/src/") "" file))
+
+(defun go-test-package()
+	(interactive)
+	(shell-command "go test -v ."))
+
 (defun run-in-project(command)
 	(interactive "s")
 	(projectile-with-default-dir (projectile-project-root)
@@ -40,7 +49,6 @@
 	(interactive)
 	(shell-command (concat "go run " (buffer-file-name))))
 
-
 (defun go-local-playground()
 	(interactive)
 	(let ((tmp-go-file (concat "/tmp/"
@@ -55,16 +63,22 @@
                           (local-set-key (kbd "C-c C-r") 'go-remove-unused-imports)
 													(local-set-key (kbd "C-c o") 'godoc-at-point)
 													(local-set-key (kbd "C-c r") 'go-run-file)
+													(local-set-key (kbd "C-c t") 'go-test-package)
+                          (highlight-symbol-mode t)
+                          (local-set-key (kbd "s-.") 'highlight-symbol-next)
+                          (local-set-key (kbd "s-,") 'highlight-symbol-prev)
 													))
 
 (global-set-key (kbd "C-c g u") 'goose-up-project)
 (global-set-key (kbd "C-c g d") 'goose-down-project)
 (global-set-key (kbd "s-b") 'gb-build-project)
 (global-set-key (kbd "s-p") 'go-local-playground)
+(global-set-key (kbd "s-`") 'avy-goto-word-or-subword-1)
 
-(global-set-key (kbd "C-c C-f") '(lambda()
+(global-set-key (kbd "C-c F") '(lambda()
 																	 (interactive)
-																	 (helm-do-ag "/home/yauhen/ws/src/junolab.net/")))
+																	 (helm-do-ag (concat (getenv "JUNO") "/"))))
+
 (global-set-key (kbd "C-c f") 'helm-do-ag)
 
 (add-to-list 'load-path "$GOPATH/src/github.com/nsf/gocode/emacs/")
@@ -105,10 +119,11 @@
  ;; If there is more than one, they won't work right.
  '(column-number-mode t)
  '(custom-safe-themes
-	 (quote
-		("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
+   (quote
+    ("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
  '(flycheck-display-errors-delay 1.0)
  '(git-commit-summary-max-length 256)
+ '(highlight-symbol-idle-delay 0.3)
  '(inhibit-startup-screen t)
  '(json-reformat:indent-width 2)
  '(json-reformat:pretty-string\? t)
@@ -254,6 +269,23 @@ Version 2015-06-12"
   (let (
 	(files (delq nil (mapcar (lambda (filename) (if (string= "go" (file-name-extension filename)) filename nil)) (projectile-current-project-files)))))
     (imenus-files files nil "Search in project:")))
+
+(add-to-list 'auto-mode-alist '("\\.yml$" . yaml-mode))
+(add-to-list 'auto-mode-alist '("\\.yml.tmpl$" . yaml-mode))
+(add-to-list 'auto-mode-alist '("\\.yaml.tmpl$" . yaml-mode))
+
+(setq-default indent-tabs-mode nil)
+
+(defun lower-and-concat (b e)
+  (interactive "r")
+  (save-restriction
+    (narrow-to-region b e)
+    (goto-char (point-min))
+    (downcase-region b e)
+    (while (re-search-forward "[ \t]+" nil t)
+      (replace-match "_"))))
+
+(global-set-key (kbd "s-u") 'lower-and-concat)
 
 (provide 'init)
 ;;; init.el ends here

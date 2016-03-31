@@ -76,8 +76,8 @@
 (global-set-key (kbd "s-`") 'avy-goto-word-or-subword-1)
 
 (global-set-key (kbd "C-c F") '(lambda()
-																	 (interactive)
-																	 (helm-do-ag (concat (getenv "JUNO") "/"))))
+					(interactive)
+					(helm-do-ag (concat (getenv "JUNO") "/"))))
 
 (global-set-key (kbd "C-c f") 'helm-do-ag)
 
@@ -141,7 +141,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "DejaVu Sans Mono" :foundry "PfEd" :slant normal :weight normal :height 121 :width normal)))))
+ '(default ((t (:family "DejaVu Sans Mono" :foundry "PfEd" :slant normal :weight normal :height 111 :width normal)))))
 
 (toggle-frame-maximized)
 
@@ -192,8 +192,15 @@
 (setq make-backup-files nil)
 (setq auto-save-default nil)
 
-(package-initialize)
-(elpy-enable)
+;(add-hook 'python-mode-hook 'jedi:setup)
+;(setq jedi:complete-on-dot t)
+;(add-hook 'ein:connect-mode-hook 'ein:jedi-setup)
+;(add-hook 'python-mode-hook 'anaconda-mode)
+;(add-hook 'python-mode-hook 'guess-style-guess-tabs-mode)
+;   (add-hook 'python-mode-hook (lambda ()
+;                                    (guess-style-guess-tab-width)))
+;(package-initialize)
+;(elpy-enable)
 
 (defun show-file-name ()
   "Show the full path file name in the minibuffer."
@@ -226,9 +233,8 @@
 ;(global-set-key (kbd "S-s-<up>") 'enlarge-window)
 
 
-(add-to-list 'yas-snippet-dirs "~/Misc/emacs/yasnippet-go")
-
 (require 'yasnippet)
+(add-to-list 'yas-snippet-dirs "~/Misc/emacs/yasnippet-go")
 (yas-global-mode 1)
 
 (defun rename-file-and-buffer ()

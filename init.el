@@ -26,7 +26,7 @@
 
 (defun go-test-package()
 	(interactive)
-	(shell-command "go test -v ."))
+	(shell-command "gb test -v"))
 
 (defun run-in-project(command)
 	(interactive "s")
@@ -51,7 +51,7 @@
 
 (defun go-local-playground()
 	(interactive)
-	(let ((tmp-go-file (concat "/tmp/"
+	(let ((tmp-go-file (concat "/home/yauhen/ws/src/playground/"
 														 (replace-regexp-in-string "\\." "playground\/" (number-to-string (float-time)))
 														 ".go")))
 		(let ((dir (file-name-directory tmp-go-file)))
@@ -95,7 +95,14 @@
 (flycheck-tip-use-timer 'verbose)
 (set-face-attribute 'eldoc-highlight-function-argument nil :underline nil :foreground "red" :weight 'bold)
 
-(setq-default flycheck-disabled-checkers '(go-vet go-golint))
+(flycheck-define-checker gb-build
+  "A Go syntax and type checker using the `gb build' command."
+  :command ("gb" "build")
+  :error-patterns ((error line-start (file-name) ":" line ":" (message) line-end))
+  :modes go-mode)
+
+(add-to-list 'flycheck-checkers 'gb-build)
+(setq-default flycheck-disabled-checkers '(go-vet go-golint go-build))
 (set-face-attribute 'flycheck-error nil :underline (list :color "red" :style 'wave) :foreground nil :background nil)
 (set-face-attribute 'flycheck-warning nil :underline (list :color "yellow" :style 'wave) :background nil :foreground nil)
 
@@ -122,6 +129,7 @@
    (quote
     ("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
  '(flycheck-display-errors-delay 1.0)
+ '(flycheck-go-build-executable "gb")
  '(git-commit-summary-max-length 256)
  '(highlight-symbol-idle-delay 0.3)
  '(inhibit-startup-screen t)
@@ -134,7 +142,8 @@
  '(sql-indent-offset 2)
  '(sr-speedbar-right-side nil)
  '(sr-speedbar-width 20 t)
- '(tool-bar-mode nil))
+ '(tool-bar-mode nil)
+ '(uniquify-buffer-name-style (quote forward) nil (uniquify)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -286,6 +295,7 @@ Version 2015-06-12"
       (replace-match "_"))))
 
 (global-set-key (kbd "s-u") 'lower-and-concat)
+(global-set-key (kbd "s-q") 'er/expand-region)
 
 (provide 'init)
 ;;; init.el ends here

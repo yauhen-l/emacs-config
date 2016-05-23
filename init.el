@@ -74,6 +74,7 @@
 (global-set-key (kbd "s-b") 'gb-build-project)
 (global-set-key (kbd "s-p") 'go-local-playground)
 (global-set-key (kbd "s-`") 'avy-goto-word-or-subword-1)
+(global-set-key (kbd "C-c b") 'magit-blame)
 
 (global-set-key (kbd "C-c F") '(lambda()
 																	 (interactive)
@@ -91,10 +92,11 @@
 (require 'auto-complete-config)
 (require 'go-eldoc)
 (add-hook 'go-mode-hook 'go-eldoc-setup)
-(require 'flycheck-tip)
-(flycheck-tip-use-timer 'verbose)
+;(require 'flycheck-tip)
+;(flycheck-tip-use-timer 'verbose)
 (set-face-attribute 'eldoc-highlight-function-argument nil :underline nil :foreground "red" :weight 'bold)
 
+(require 'flycheck)
 (flycheck-define-checker gb-build
   "A Go syntax and type checker using the `gb build' command."
   :command ("gb" "build")

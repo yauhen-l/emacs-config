@@ -125,7 +125,7 @@
  '(git-commit-summary-max-length 256)
  '(highlight-symbol-idle-delay 0.3)
  '(inhibit-startup-screen t)
- '(json-reformat:indent-width 2)
+ '(json-reformat:indent-width 4)
  '(json-reformat:pretty-string\? t)
  '(semantic-mode t)
  '(speedbar-show-unknown-files t)
@@ -292,6 +292,7 @@ Version 2015-06-12"
       (replace-match "_"))))
 
 (global-set-key (kbd "s-u") 'lower-and-concat)
+(global-set-key (kbd "C-=") 'er/expand-region)
 
 (provide 'init)
 ;;; init.el ends here

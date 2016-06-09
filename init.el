@@ -190,6 +190,7 @@
 (projectile-global-mode)
 ;(setq projectile-completion-system 'helm)
 (helm-projectile-on)
+(setq projectile-switch-project-action 'projectile-dired)
 
 (require 'helm-config)
 (global-set-key (kbd "M-x") 'helm-M-x)

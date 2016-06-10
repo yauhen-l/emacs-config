@@ -31,11 +31,13 @@
 (defun run-in-project(command)
 	(interactive "s")
 	(projectile-with-default-dir (projectile-project-root)
-		(shell-command command)))
+    (with-output-to-temp-buffer "gb-build"
+      (print
+       (shell-command-to-string command)))))
 
 (defun gb-build-project()
 	(interactive)
-	(run-in-project "gb build"))
+	(projectile-compile-project "gb build"))
 
 (defun goose-up-project()
 	(interactive)
@@ -48,6 +50,10 @@
 (defun go-run-file()
 	(interactive)
 	(shell-command (concat "go run " (buffer-file-name))))
+
+(defun nodejs-run-file()
+	(interactive)
+	(shell-command (concat "node " (buffer-file-name))))
 
 (defun go-local-playground()
 	(interactive)
@@ -69,6 +75,14 @@
                           (local-set-key (kbd "s-,") 'highlight-symbol-prev)
 													))
 
+(add-hook 'js-mode-hook (lambda ()
+													(local-set-key (kbd "C-c r") 'nodejs-run-file)
+                          (highlight-symbol-mode t)
+                          (local-set-key (kbd "s-.") 'highlight-symbol-next)
+                          (local-set-key (kbd "s-,") 'highlight-symbol-prev)
+                          ))
+
+
 (global-set-key (kbd "C-c g u") 'goose-up-project)
 (global-set-key (kbd "C-c g d") 'goose-down-project)
 (global-set-key (kbd "s-b") 'gb-build-project)
@@ -81,6 +95,7 @@
 																	 (helm-do-ag (concat (getenv "JUNO") "/"))))
 
 (global-set-key (kbd "C-c f") 'helm-do-ag)
+(global-set-key (kbd "C-c s") 'anzu-query-replace-regexp)
 
 (add-to-list 'load-path "$GOPATH/src/github.com/nsf/gocode/emacs/")
 
@@ -110,6 +125,9 @@
 
 (ac-config-default)
 
+(setq ac-auto-start nil)
+(ac-set-trigger-key "TAB")
+
 ;(require 'sr-speedbar)
 
 (linum-mode 1)
@@ -133,6 +151,8 @@
  '(flycheck-display-errors-delay 1.0)
  '(flycheck-go-build-executable "gb")
  '(git-commit-summary-max-length 256)
+ '(helm-ag-base-command "ag --nocolor --nogroup -f")
+ '(helm-ag-command-option -f)
  '(highlight-symbol-idle-delay 0.3)
  '(inhibit-startup-screen t)
  '(json-reformat:indent-width 2)

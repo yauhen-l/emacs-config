@@ -88,11 +88,12 @@
 (global-set-key (kbd "s-b") 'gb-build-project)
 (global-set-key (kbd "s-p") 'go-local-playground)
 (global-set-key (kbd "s-`") 'avy-goto-word-or-subword-1)
+(global-set-key (kbd "s-a") 'helm-projectile-ag)
 (global-set-key (kbd "C-c b") 'magit-blame)
 
 (global-set-key (kbd "C-c F") '(lambda()
-					(interactive)
-					(helm-do-ag (concat (getenv "JUNO") "/"))))
+                                 (interactive)
+                                 (helm-do-ag (concat (getenv "JUNO") "/"))))
 
 (global-set-key (kbd "C-c f") 'helm-do-ag)
 (global-set-key (kbd "C-c s") 'anzu-query-replace-regexp)
@@ -151,8 +152,7 @@
  '(flycheck-display-errors-delay 1.0)
  '(flycheck-go-build-executable "gb")
  '(git-commit-summary-max-length 256)
- '(helm-ag-base-command "ag --nocolor --nogroup -f")
- '(helm-ag-command-option -f)
+ '(helm-ag-base-command "ag -f --nocolor --nogroup")
  '(highlight-symbol-idle-delay 0.3)
  '(inhibit-startup-screen t)
  '(json-reformat:indent-width 4)
@@ -207,16 +207,17 @@
 
 (delete-selection-mode 1)
 
-(projectile-global-mode)
-;(setq projectile-completion-system 'helm)
-(helm-projectile-on)
-(setq projectile-switch-project-action 'projectile-dired)
-
+(require 'helm-projectile)
 (require 'helm-config)
 (global-set-key (kbd "M-x") 'helm-M-x)
 (global-set-key (kbd "C-x C-f") 'helm-find-files)
 (helm-mode 1)
 
+(projectile-global-mode)
+(setq projectile-completion-system 'helm)
+(helm-projectile-on)
+;;(setq projectile-switch-project-action 'projectile-dired)
+;;(projectile-register-project-type 'go #'projectile-go "gb build" "gb test")
 
 (add-hook 'json-mode 'flymake-json-load)
 (add-hook 'js-mode-hook 'flymake-json-maybe-load)

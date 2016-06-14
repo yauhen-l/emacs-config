@@ -4,6 +4,9 @@
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
+(define-key input-decode-map "\e[42~" [(f42)])
+(define-key key-translation-map (kbd "<f42>") (kbd "<s>"))
+
 (require 'package)
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/"))
@@ -12,12 +15,16 @@
   (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
 (package-initialize)
 
+(benchmark-init/activate)
+
 (add-to-list 'load-path "~/Misc/emacs/go-mode.el/")
 (add-to-list 'load-path "~/Misc/emacs/emacs-go-eldoc/")
-(add-to-list 'load-path "~/Misc/emacs/flycheck-tip/")
-(require 'go-mode-autoloads)
+(add-to-list 'load-path "$GOPATH/src/github.com/nsf/gocode/emacs/")
 
-(add-hook 'before-save-hook 'gofmt-before-save)
+(load-file "$GOPATH/src/golang.org/x/tools/cmd/oracle/oracle.el")
+(load-file "$GOPATH/src/golang.org/x/tools/refactor/rename/go-rename.el")
+
+(require 'go-mode-autoloads)
 
 (defvar init-GOPATH (getenv "GOPATH"))
 
@@ -66,6 +73,7 @@
 			(find-file tmp-go-file))))
 
 (add-hook 'go-mode-hook (lambda ()
+                          (add-hook 'before-save-hook 'gofmt-before-save)
                           (local-set-key (kbd "C-c C-r") 'go-remove-unused-imports)
 													(local-set-key (kbd "C-c o") 'godoc-at-point)
 													(local-set-key (kbd "C-c r") 'go-run-file)
@@ -98,16 +106,12 @@
 (global-set-key (kbd "C-c f") 'helm-do-ag)
 (global-set-key (kbd "C-c s") 'anzu-query-replace-regexp)
 
-(add-to-list 'load-path "$GOPATH/src/github.com/nsf/gocode/emacs/")
-
-(load-file "$GOPATH/src/golang.org/x/tools/cmd/oracle/oracle.el")
-(load-file "$GOPATH/src/golang.org/x/tools/refactor/rename/go-rename.el")
-
 (add-hook 'after-init-hook #'global-flycheck-mode)
 (require 'go-autocomplete)
 (require 'auto-complete-config)
 (require 'go-eldoc)
 (add-hook 'go-mode-hook 'go-eldoc-setup)
+;(add-to-list 'load-path "~/Misc/emacs/flycheck-tip/")
 ;(require 'flycheck-tip)
 ;(flycheck-tip-use-timer 'verbose)
 (set-face-attribute 'eldoc-highlight-function-argument nil :underline nil :foreground "red" :weight 'bold)
@@ -162,9 +166,14 @@
  '(speedbar-use-images t)
  '(sql-indent-maybe-tab t)
  '(sql-indent-offset 2)
+ '(sql-mysql-login-params (quote (user password server database port)))
+ '(sql-port 3306)
+ '(sql-server "localhost")
  '(sr-speedbar-right-side nil)
  '(sr-speedbar-width 20 t)
  '(tool-bar-mode nil)
+ '(x-select-enable-clipboard t)
+ '(interprogram-paste-function 'x-cut-buffer-or-selection-value)
  '(uniquify-buffer-name-style (quote forward) nil (uniquify)))
 
 (custom-set-faces
@@ -175,6 +184,7 @@
  '(default ((t (:family "DejaVu Sans Mono" :foundry "PfEd" :slant normal :weight normal :height 111 :width normal)))))
 
 (toggle-frame-maximized)
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
 
 ;(desktop-save-mode 1)
 
@@ -326,6 +336,38 @@ Version 2015-06-12"
 
 (global-set-key (kbd "s-u") 'lower-and-concat)
 (global-set-key (kbd "s-q") 'er/expand-region)
+
+;; If emacs is run in a terminal, the clipboard- functions have no
+;; effect. Instead, we use of xsel, see
+;; http://www.vergenet.net/~conrad/software/xsel/ -- "a command-line
+;; program for getting and setting the contents of the X selection"
+(unless window-system
+  (when (getenv "DISPLAY")
+    ;; Callback for when user cuts
+    (defun xsel-cut-function (text &optional push)
+      ;; Insert text to temp-buffer, and "send" content to xsel stdin
+      (with-temp-buffer
+        (insert text)
+        ;; I prefer using the "clipboard" selection (the one the
+        ;; typically is used by c-c/c-v) before the primary selection
+        ;; (that uses mouse-select/middle-button-click)
+        (call-process-region (point-min) (point-max) "xsel" nil 0 nil "--clipboard" "--input")))
+    ;; Call back for when user pastes
+    (defun xsel-paste-function()
+      ;; Find out what is current selection by xsel. If it is different
+      ;; from the top of the kill-ring (car kill-ring), then return
+      ;; it. Else, nil is returned, so whatever is in the top of the
+      ;; kill-ring will be used.
+      (let ((xsel-output (shell-command-to-string "xsel --clipboard --output")))
+        (unless (string= (car kill-ring) xsel-output)
+          xsel-output )))
+    ;; Attach callbacks to hooks
+    (setq interprogram-cut-function 'xsel-cut-function)
+    (setq interprogram-paste-function 'xsel-paste-function)
+    ;; Idea from
+    ;; http://shreevatsa.wordpress.com/2006/10/22/emacs-copypaste-and-x/
+    ;; http://www.mail-archive.com/help-gnu-emacs@gnu.org/msg03577.html
+    ))
 
 (provide 'init)
 ;;; init.el ends here

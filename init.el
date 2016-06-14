@@ -33,7 +33,7 @@
 	(projectile-with-default-dir (projectile-project-root)
     (with-output-to-temp-buffer "gb-build"
       (print
-       (shell-command-to-string command)))))
+       (async-shell-command command)))))
 
 (defun gb-build-project()
 	(interactive)
@@ -148,7 +148,7 @@
  '(column-number-mode t)
  '(custom-safe-themes
    (quote
-    ("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
+    ("a11043406c7c4233bfd66498e83600f4109c83420714a2bd0cd131f81cbbacea" "780c67d3b58b524aa485a146ad9e837051918b722fd32fd1b7e50ec36d413e70" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
  '(flycheck-display-errors-delay 1.0)
  '(flycheck-go-build-executable "gb")
  '(git-commit-summary-max-length 256)

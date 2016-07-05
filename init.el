@@ -109,7 +109,15 @@
 (add-hook 'after-init-hook #'global-flycheck-mode)
 (require 'go-autocomplete)
 (require 'auto-complete-config)
+(ac-config-default)
+(setq ac-auto-start nil)
+(ac-set-trigger-key "TAB")
+
 (require 'go-eldoc)
+
+
+;(require 'go-complete)
+;(add-hook 'completion-at-point-functions 'go-complete-at-point)
 (add-hook 'go-mode-hook 'go-eldoc-setup)
 ;(add-to-list 'load-path "~/Misc/emacs/flycheck-tip/")
 ;(require 'flycheck-tip)
@@ -127,11 +135,6 @@
 (setq-default flycheck-disabled-checkers '(go-vet go-golint go-build))
 (set-face-attribute 'flycheck-error nil :underline (list :color "red" :style 'wave) :foreground nil :background nil)
 (set-face-attribute 'flycheck-warning nil :underline (list :color "yellow" :style 'wave) :background nil :foreground nil)
-
-(ac-config-default)
-
-(setq ac-auto-start nil)
-(ac-set-trigger-key "TAB")
 
 ;(require 'sr-speedbar)
 
@@ -181,7 +184,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "DejaVu Sans Mono" :foundry "PfEd" :slant normal :weight normal :height 111 :width normal)))))
+ '(default ((t (:family "DejaVu Sans Mono" :foundry "PfEd" :slant normal :weight normal :height 108 :width normal)))))
 
 (toggle-frame-maximized)
 (add-to-list 'default-frame-alist '(fullscreen . maximized))

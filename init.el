@@ -64,7 +64,8 @@
 
 (defun go-local-playground()
 	(interactive)
-	(let ((tmp-go-file (concat "/home/yauhen/ws/src/playground/"
+	(let ((tmp-go-file (concat init-GOPATH
+                             "/src/playground/"
 														 (replace-regexp-in-string "\\." "playground\/" (number-to-string (float-time)))
 														 ".go")))
 		(let ((dir (file-name-directory tmp-go-file)))
@@ -72,6 +73,20 @@
 			(copy-file "~/.emacs.d/gotmpl.go" tmp-go-file)
 			(find-file tmp-go-file))))
 
+(defun go-juno-pkg-alias(url)
+  (let ((import (split-string url "/")))
+    (let ((host (pop import))
+          (proj (pop import))
+          (pkg (car (last import))))
+      (when (and (string= host "junolab.net")
+               (or (string= pkg "api")
+                   (string= pkg "subjects"))
+               (not (string= proj (projectile-project-name)))
+               (not (string= proj "ms"))
+               (not (string= proj "ms_core")))
+          (concat (subseq proj 3) "_" pkg)))))
+
+;(setq gofmt-command "goimports")
 (add-hook 'go-mode-hook (lambda ()
                           (add-hook 'before-save-hook 'gofmt-before-save)
                           (local-set-key (kbd "C-c C-r") 'go-remove-unused-imports)

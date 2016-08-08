@@ -74,17 +74,18 @@
 			(find-file tmp-go-file))))
 
 (defun go-juno-pkg-alias(url)
-  (let ((import (split-string url "/")))
+  (let ((import (split-string url "/"))
+        (skipProj '("ms" "ms_core")))
     (let ((host (pop import))
           (proj (pop import))
           (pkg (car (last import))))
-      (when (and (string= host "junolab.net")
-               (or (string= pkg "api")
-                   (string= pkg "subjects"))
-               (not (string= proj (projectile-project-name)))
-               (not (string= proj "ms"))
-               (not (string= proj "ms_core")))
+      (add-to-list 'skipProj (projectile-project-name))
+      (when (and pkg
+             (string= host "junolab.net")
+             (not (member proj skipProj)))
           (concat (subseq proj 3) "_" pkg)))))
+
+;(go-juno-pkg-alias "junolab.net/ms_rides/api")
 
 ;(setq gofmt-command "goimports")
 (add-hook 'go-mode-hook (lambda ()

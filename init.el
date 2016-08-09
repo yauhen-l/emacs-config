@@ -38,9 +38,9 @@
 (defun run-in-project(command)
 	(interactive "s")
 	(projectile-with-default-dir (projectile-project-root)
-    (with-output-to-temp-buffer "gb-build"
-      (print
-       (async-shell-command command)))))
+    (let ((buffer-name (concat "*run-in-project: " command  "*")))
+      (with-output-to-temp-buffer buffer-name
+        (shell-command command buffer-name)))))
 
 (defun gb-build-project()
 	(interactive)
@@ -208,6 +208,7 @@
 
 (global-set-key (kbd "C-c C-c") "\C-a\C- \C-n\M-w\C-y")
 (global-set-key (kbd "s-l") (kbd "C-c ! l"))
+(global-set-key (kbd "s-/") 'comment-or-uncomment-region)
 (global-set-key (kbd "<s-down>") (kbd "C-c ! n"))
 (global-set-key (kbd "<s-up>") (kbd "C-c ! p"))
 ;;Move line up
@@ -234,6 +235,13 @@
 
 (setq make-backup-files nil)
 (setq auto-save-default nil)
+
+(custom-set-variables
+ '(go-impl-aliases-alist '(("sc" . "sql.Scanner")
+                           ("val" . "driver.Valuer")
+                           ("valid" . "types.Validatable")
+                           ("m" . "json.Marshaler")
+                           ("um" . "json.Unmarshaler"))))
 
 ;(add-hook 'python-mode-hook 'jedi:setup)
 ;(setq jedi:complete-on-dot t)
@@ -277,7 +285,8 @@
 
 
 (require 'yasnippet)
-(add-to-list 'yas-snippet-dirs "~/Misc/emacs/yasnippet-go")
+;(setq-default yas-snippet-dirs '("~/.emacs.d/snippets")
+(add-to-list 'yas-snippet-dirs "~/Misc/emacs/yasnippet-custom")
 (yas-global-mode 1)
 
 (defun rename-file-and-buffer ()
@@ -368,6 +377,28 @@ Version 2015-06-12"
     ;; http://shreevatsa.wordpress.com/2006/10/22/emacs-copypaste-and-x/
     ;; http://www.mail-archive.com/help-gnu-emacs@gnu.org/msg03577.html
     ))
+
+(defun buffer-on-bottom-side (&rest res)
+  (dolist (re res)
+    (add-to-list 'display-buffer-alist
+                 `(,re
+                   (display-buffer-reuse-window
+                    display-buffer-in-side-window)
+                   (reusable-frames . visible)
+                   (side            . bottom)
+                   (window-height   . 0.2)))))
+
+(buffer-on-bottom-side "^\\*[^magit].+\\*$")
+
+(defun my/quit-bottom-side-windows ()
+  "Quit bottom side windows of the current frame."
+  (interactive)
+  (dolist (window (window-at-side-list nil 'bottom))
+    (when (eq (window-parameter window 'window-side) 'bottom)
+      (delete-window window))))
+
+(global-set-key (kbd "C-c k") 'my/quit-bottom-side-windows)
+
 
 (provide 'init)
 ;;; init.el ends here

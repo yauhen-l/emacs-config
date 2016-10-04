@@ -21,9 +21,6 @@
 (add-to-list 'load-path "~/Misc/emacs/emacs-go-eldoc/")
 (add-to-list 'load-path "$GOPATH/src/github.com/nsf/gocode/emacs/")
 
-(load-file "$GOPATH/src/golang.org/x/tools/cmd/oracle/oracle.el")
-(load-file "$GOPATH/src/golang.org/x/tools/refactor/rename/go-rename.el")
-
 (require 'go-mode-autoloads)
 
 (defvar init-GOPATH (getenv "GOPATH"))
@@ -87,7 +84,7 @@
 
 ;(go-juno-pkg-alias "junolab.net/ms_rides/api")
 
-;(setq gofmt-command "goimports")
+(setq gofmt-command "goimports")
 (add-hook 'go-mode-hook (lambda ()
                           (add-hook 'before-save-hook 'gofmt-before-save)
                           (local-set-key (kbd "C-c C-r") 'go-remove-unused-imports)
@@ -97,6 +94,9 @@
                           (highlight-symbol-mode t)
                           (local-set-key (kbd "s-.") 'highlight-symbol-next)
                           (local-set-key (kbd "s-,") 'highlight-symbol-prev)
+                          (local-set-key (kbd "<f5>") 'go-guru-describe)
+                          (local-set-key (kbd "<f6>") 'go-guru-referrers)
+                          (go-guru-hl-identifier-mode)
 													))
 
 (add-hook 'js-mode-hook (lambda ()
@@ -175,11 +175,23 @@
  '(flycheck-display-errors-delay 1.0)
  '(flycheck-go-build-executable "gb")
  '(git-commit-summary-max-length 256)
+ '(go-impl-aliases-alist
+   (quote
+    (("sc" . "sql.Scanner")
+     ("val" . "driver.Valuer")
+     ("valid" . "types.Validatable")
+     ("m" . "json.Marshaler")
+     ("um" . "json.Unmarshaler"))))
  '(helm-ag-base-command "ag -f --nocolor --nogroup")
  '(highlight-symbol-idle-delay 0.3)
  '(inhibit-startup-screen t)
+ '(interprogram-paste-function (quote x-cut-buffer-or-selection-value) t)
  '(json-reformat:indent-width 4)
  '(json-reformat:pretty-string\? t)
+ '(package-selected-packages
+   (quote
+    (lua-mode drag-stuff helm-go-package yaml-mode yafolding web-mode web-beautify thing-cmds swiper nodejs-repl move-text magit json-mode imenus howdoi highlight-symbol helm-projectile helm-ag golden-ratio go-projectile go-impl go-direx go-autocomplete format-sql flymake-json flycheck-tip expand-region elpy color-theme-modern benchmark-init avy anzu ag)))
+ '(select-enable-clipboard t)
  '(semantic-mode t)
  '(speedbar-show-unknown-files t)
  '(speedbar-use-images t)
@@ -191,8 +203,6 @@
  '(sr-speedbar-right-side nil)
  '(sr-speedbar-width 20 t)
  '(tool-bar-mode nil)
- '(x-select-enable-clipboard t)
- '(interprogram-paste-function 'x-cut-buffer-or-selection-value)
  '(uniquify-buffer-name-style (quote forward) nil (uniquify)))
 
 (custom-set-faces
@@ -200,7 +210,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "DejaVu Sans Mono" :foundry "PfEd" :slant normal :weight normal :height 108 :width normal)))))
+ '(default ((t (:family "DejaVu Sans Mono" :foundry "PfEd" :slant normal :weight normal :height 111 :width normal)))))
 
 (toggle-frame-maximized)
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
@@ -230,10 +240,11 @@
 (global-set-key (kbd "s-/") 'comment-or-uncomment-region)
 (global-set-key (kbd "<s-down>") (kbd "C-c ! n"))
 (global-set-key (kbd "<s-up>") (kbd "C-c ! p"))
+(drag-stuff-global-mode)
 ;;Move line up
-(global-set-key (kbd "<M-up>") 'move-text-up)
+;(global-set-key (kbd "<M-up>") 'move-text-up)
 ;;Move line down
-(global-set-key (kbd "<M-down>") 'move-text-down)
+;(global-set-key (kbd "<M-down>") 'move-text-down)
 
 (delete-selection-mode 1)
 
@@ -254,23 +265,6 @@
 
 (setq make-backup-files nil)
 (setq auto-save-default nil)
-
-(custom-set-variables
- '(go-impl-aliases-alist '(("sc" . "sql.Scanner")
-                           ("val" . "driver.Valuer")
-                           ("valid" . "types.Validatable")
-                           ("m" . "json.Marshaler")
-                           ("um" . "json.Unmarshaler"))))
-
-;(add-hook 'python-mode-hook 'jedi:setup)
-;(setq jedi:complete-on-dot t)
-;(add-hook 'ein:connect-mode-hook 'ein:jedi-setup)
-;(add-hook 'python-mode-hook 'anaconda-mode)
-;(add-hook 'python-mode-hook 'guess-style-guess-tabs-mode)
-;   (add-hook 'python-mode-hook (lambda ()
-;                                    (guess-style-guess-tab-width)))
-;(package-initialize)
-;(elpy-enable)
 
 (defun show-file-name ()
   "Show the full path file name in the minibuffer."
@@ -407,6 +401,7 @@ Version 2015-06-12"
                    (side            . bottom)
                    (window-height   . 0.2)))))
 
+(buffer-on-bottom-side "*go-guru-output*")
 (buffer-on-bottom-side "^\\*[^magit].+\\*$")
 
 (defun my/quit-bottom-side-windows ()
@@ -417,6 +412,8 @@ Version 2015-06-12"
       (delete-window window))))
 
 (global-set-key (kbd "C-c k") 'my/quit-bottom-side-windows)
+
+(global-set-key (kbd "C-c h g") 'helm-go-package)
 
 
 (provide 'init)

@@ -17,12 +17,12 @@
 
 (benchmark-init/activate)
 
-(add-to-list 'load-path "~/Misc/emacs/go-mode.el/")
-(add-to-list 'load-path "~/Misc/emacs/emacs-go-eldoc/")
-(add-to-list 'load-path "$GOPATH/src/github.com/nsf/gocode/emacs/")
+;(add-to-list 'load-path "~/Misc/emacs/go-mode.el/")
+;(add-to-list 'load-path "~/Misc/emacs/emacs-go-eldoc/")
+;(add-to-list 'load-path "$GOPATH/src/github.com/nsf/gocode/emacs/")
 
-(load-file "$GOPATH/src/golang.org/x/tools/cmd/oracle/oracle.el")
-(load-file "$GOPATH/src/golang.org/x/tools/refactor/rename/go-rename.el")
+;(load-file "$GOPATH/src/golang.org/x/tools/cmd/oracle/oracle.el")
+;(load-file "$GOPATH/src/golang.org/x/tools/refactor/rename/go-rename.el")
 
 (require 'go-mode-autoloads)
 
@@ -175,11 +175,23 @@
  '(flycheck-display-errors-delay 1.0)
  '(flycheck-go-build-executable "gb")
  '(git-commit-summary-max-length 256)
+ '(go-impl-aliases-alist
+   (quote
+    (("sc" . "sql.Scanner")
+     ("val" . "driver.Valuer")
+     ("valid" . "types.Validatable")
+     ("m" . "json.Marshaler")
+     ("um" . "json.Unmarshaler"))))
  '(helm-ag-base-command "ag -f --nocolor --nogroup")
  '(highlight-symbol-idle-delay 0.3)
  '(inhibit-startup-screen t)
+ '(interprogram-paste-function (quote x-cut-buffer-or-selection-value) t)
  '(json-reformat:indent-width 4)
  '(json-reformat:pretty-string\? t)
+ '(package-selected-packages
+   (quote
+    (move-text thing-cmds helm-ag-r ag lua-mode yasnippet magit json-mode imenus highlight-symbol helm-projectile helm-ag golden-ratio go-rename go-impl go-guru go-eldoc go-autocomplete flycheck color-theme-modern benchmark-init avy anzu)))
+ '(select-enable-clipboard t)
  '(semantic-mode t)
  '(speedbar-show-unknown-files t)
  '(speedbar-use-images t)
@@ -191,8 +203,6 @@
  '(sr-speedbar-right-side nil)
  '(sr-speedbar-width 20 t)
  '(tool-bar-mode nil)
- '(x-select-enable-clipboard t)
- '(interprogram-paste-function 'x-cut-buffer-or-selection-value)
  '(uniquify-buffer-name-style (quote forward) nil (uniquify)))
 
 (custom-set-faces
@@ -200,7 +210,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "DejaVu Sans Mono" :foundry "PfEd" :slant normal :weight normal :height 108 :width normal)))))
+ '(default ((t (:family "DejaVu Sans Mono" :foundry "PfEd" :slant normal :weight normal :height 110 :width normal)))))
 
 (toggle-frame-maximized)
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
@@ -255,12 +265,7 @@
 (setq make-backup-files nil)
 (setq auto-save-default nil)
 
-(custom-set-variables
- '(go-impl-aliases-alist '(("sc" . "sql.Scanner")
-                           ("val" . "driver.Valuer")
-                           ("valid" . "types.Validatable")
-                           ("m" . "json.Marshaler")
-                           ("um" . "json.Unmarshaler"))))
+
 
 ;(add-hook 'python-mode-hook 'jedi:setup)
 ;(setq jedi:complete-on-dot t)

@@ -17,13 +17,6 @@
 
 (benchmark-init/activate)
 
-;(add-to-list 'load-path "~/Misc/emacs/go-mode.el/")
-;(add-to-list 'load-path "~/Misc/emacs/emacs-go-eldoc/")
-;(add-to-list 'load-path "$GOPATH/src/github.com/nsf/gocode/emacs/")
-
-;(load-file "$GOPATH/src/golang.org/x/tools/cmd/oracle/oracle.el")
-;(load-file "$GOPATH/src/golang.org/x/tools/refactor/rename/go-rename.el")
-
 (require 'go-mode-autoloads)
 
 (defvar init-GOPATH (getenv "GOPATH"))
@@ -87,7 +80,7 @@
 
 ;(go-juno-pkg-alias "junolab.net/ms_rides/api")
 
-;(setq gofmt-command "goimports")
+(setq gofmt-command "goimports")
 (add-hook 'go-mode-hook (lambda ()
                           (add-hook 'before-save-hook 'gofmt-before-save)
                           (local-set-key (kbd "C-c C-r") 'go-remove-unused-imports)
@@ -97,6 +90,9 @@
                           (highlight-symbol-mode t)
                           (local-set-key (kbd "s-.") 'highlight-symbol-next)
                           (local-set-key (kbd "s-,") 'highlight-symbol-prev)
+                          (local-set-key (kbd "<f5>") 'go-guru-describe)
+                          (local-set-key (kbd "<f6>") 'go-guru-referrers)
+                          (go-guru-hl-identifier-mode)
 													))
 
 (add-hook 'js-mode-hook (lambda ()
@@ -190,7 +186,7 @@
  '(json-reformat:pretty-string\? t)
  '(package-selected-packages
    (quote
-    (move-text thing-cmds helm-ag-r ag lua-mode yasnippet magit json-mode imenus highlight-symbol helm-projectile helm-ag golden-ratio go-rename go-impl go-guru go-eldoc go-autocomplete flycheck color-theme-modern benchmark-init avy anzu)))
+    (ag anzu avy benchmark-init color-theme-modern drag-stuff elpy expand-region flycheck flycheck-tip flymake-json format-sql go-autocomplete go-direx go-eldoc go-guru go-impl go-projectile go-rename golden-ratio helm-ag helm-ag-r helm-go-package helm-projectile highlight-symbol howdoi imenus json-mode lua-mode magit move-text nodejs-repl swiper thing-cmds web-beautify web-mode yafolding yaml-mode yasnippet)))
  '(select-enable-clipboard t)
  '(semantic-mode t)
  '(speedbar-show-unknown-files t)
@@ -240,10 +236,11 @@
 (global-set-key (kbd "s-/") 'comment-or-uncomment-region)
 (global-set-key (kbd "<s-down>") (kbd "C-c ! n"))
 (global-set-key (kbd "<s-up>") (kbd "C-c ! p"))
+(drag-stuff-global-mode)
 ;;Move line up
-(global-set-key (kbd "<M-up>") 'move-text-up)
+;(global-set-key (kbd "<M-up>") 'move-text-up)
 ;;Move line down
-(global-set-key (kbd "<M-down>") 'move-text-down)
+;(global-set-key (kbd "<M-down>") 'move-text-down)
 
 (delete-selection-mode 1)
 
@@ -264,18 +261,6 @@
 
 (setq make-backup-files nil)
 (setq auto-save-default nil)
-
-
-
-;(add-hook 'python-mode-hook 'jedi:setup)
-;(setq jedi:complete-on-dot t)
-;(add-hook 'ein:connect-mode-hook 'ein:jedi-setup)
-;(add-hook 'python-mode-hook 'anaconda-mode)
-;(add-hook 'python-mode-hook 'guess-style-guess-tabs-mode)
-;   (add-hook 'python-mode-hook (lambda ()
-;                                    (guess-style-guess-tab-width)))
-;(package-initialize)
-;(elpy-enable)
 
 (defun show-file-name ()
   "Show the full path file name in the minibuffer."
@@ -412,6 +397,7 @@ Version 2015-06-12"
                    (side            . bottom)
                    (window-height   . 0.2)))))
 
+(buffer-on-bottom-side "*go-guru-output*")
 (buffer-on-bottom-side "^\\*[^magit].+\\*$")
 
 (defun my/quit-bottom-side-windows ()
@@ -422,6 +408,8 @@ Version 2015-06-12"
       (delete-window window))))
 
 (global-set-key (kbd "C-c k") 'my/quit-bottom-side-windows)
+
+(global-set-key (kbd "C-c h g") 'helm-go-package)
 
 
 (provide 'init)

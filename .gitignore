@@ -1,4 +1,5 @@
-**/*
+/*
+!utils
 !init.el
 !gotmpl.go
 !.gitignore

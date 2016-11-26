@@ -32,9 +32,13 @@
 	(interactive)
 	(shell-command (concat "node " (buffer-file-name))))
 
-(highlight-symbol-mode t)
-(global-set-key (kbd "s-.") 'highlight-symbol-next)
-(global-set-key (kbd "s-,") 'highlight-symbol-prev)
+(use-package highlight-symbol
+  :config
+  (highlight-symbol-mode t)
+  :bind
+  ("s-." . highlight-symbol-next)
+  ("s-," . highlight-symbol-prev))
+
 (global-set-key (kbd "s-`") 'avy-goto-word-or-subword-1)
 (global-set-key (kbd "s-a") 'helm-projectile-ag)
 (global-set-key (kbd "s-p") 'go-local-playground)
@@ -80,12 +84,13 @@
 (global-set-key (kbd "C-.") 'ac-complete-with-helm)
 (define-key ac-complete-mode-map (kbd "C-.") 'ac-complete-with-helm)
 
-(require 'flycheck)
-(with-eval-after-load 'flycheck
-  (flycheck-pos-tip-mode))
 (set-face-attribute 'eldoc-highlight-function-argument nil :underline nil :foreground "red" :weight 'bold)
-(set-face-attribute 'flycheck-error nil :underline (list :color "red" :style 'wave) :foreground nil :background nil)
-(set-face-attribute 'flycheck-warning nil :underline (list :color "yellow" :style 'wave) :background nil :foreground nil)
+
+(use-package flycheck
+  :config
+  (flycheck-pos-tip-mode)
+  (set-face-attribute 'flycheck-error nil :underline (list :color "red" :style 'wave) :foreground nil :background nil)
+  (set-face-attribute 'flycheck-warning nil :underline (list :color "yellow" :style 'wave) :background nil :foreground nil))
 
 (linum-mode 1)
 (line-number-mode 1)

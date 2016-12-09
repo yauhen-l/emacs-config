@@ -4,7 +4,7 @@
 
 (defvar init-GOPATH (getenv "GOPATH"))
 (setq gofmt-command "goimports")
-(projectile-register-project-type 'go #'projectile-go "gb build" "gb test -test.short")
+(projectile-register-project-type 'go #'projectile-go "gb generate . && gb build" "gb test -test.short")
 (require 'go-autocomplete)
 (require 'go-eldoc)
 ;(require 'go-complete)
@@ -21,9 +21,9 @@
   "A Go syntax and type checker using the `gb test' command."
   :command ("gb" "test" "-test.short" "-test.run" "^$")
   :error-patterns ((error line-start (file-name) ":" line ":" (message) line-end))
-  :predicate
-  (lambda () (and (flycheck-buffer-saved-p)
-                  (string-suffix-p "_test.go" (buffer-file-name))))
+  :predicate (lambda ()
+               (and (flycheck-buffer-saved-p)
+                    (string-suffix-p "_test.go" (buffer-file-name))))
   :modes go-mode)
 
 (add-to-list 'flycheck-checkers 'gb-build)

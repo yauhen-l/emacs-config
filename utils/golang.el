@@ -16,7 +16,18 @@
   :command ("gb" "build")
   :error-patterns ((error line-start (file-name) ":" line ":" (message) line-end))
   :modes go-mode)
+
+(flycheck-define-checker gb-test
+  "A Go syntax and type checker using the `gb test' command."
+  :command ("gb" "test" "-test.short" "-test.run" "^$")
+  :error-patterns ((error line-start (file-name) ":" line ":" (message) line-end))
+  :predicate
+  (lambda () (and (flycheck-buffer-saved-p)
+                  (string-suffix-p "_test.go" (buffer-file-name))))
+  :modes go-mode)
+
 (add-to-list 'flycheck-checkers 'gb-build)
+(add-to-list 'flycheck-checkers 'gb-test)
 (setq-default flycheck-disabled-checkers '(go-vet go-golint go-build))
 
 (add-hook 'go-mode-hook (lambda ()

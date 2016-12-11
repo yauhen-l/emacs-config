@@ -30,12 +30,16 @@
 (add-to-list 'flycheck-checkers 'gb-test)
 (setq-default flycheck-disabled-checkers '(go-vet go-golint go-build))
 
+(add-to-list 'load-path "/home/yauhen/ws/golang/src/github.com/yauhenl/gotn/")
+(require 'gotn)
+
 (add-hook 'go-mode-hook (lambda ()
                           (add-hook 'before-save-hook 'gofmt-before-save)
                           (local-set-key (kbd "C-c C-r") 'go-remove-unused-imports)
 													(local-set-key (kbd "C-c o") 'godoc-at-point)
 													(local-set-key (kbd "C-c r") 'go-run-file)
 													(local-set-key (kbd "C-c t") 'go-test-package)
+													(local-set-key (kbd "C-c C-t") 'gotn-run-test)
                           (local-set-key (kbd "<f5>") 'go-guru-describe)
                           (local-set-key (kbd "<f6>") 'go-guru-referrers)
                           (local-set-key (kbd "C-c g u") 'goose-up-project)

@@ -22,6 +22,10 @@
       (with-output-to-temp-buffer buffer-name
         (shell-command command buffer-name)))))
 
+(defun run-in-project-no-output(command)
+	(interactive "s")
+	(projectile-with-default-dir (projectile-project-root)
+    (shell-command command)))
 
 (add-hook 'js-mode-hook (lambda ()
 													(local-set-key (kbd "C-c r") 'nodejs-run-file)
@@ -33,11 +37,12 @@
 	(shell-command (concat "node " (buffer-file-name))))
 
 (use-package highlight-symbol
-  :config
-  (highlight-symbol-mode t)
   :bind
   ("s-." . highlight-symbol-next)
   ("s-," . highlight-symbol-prev))
+(highlight-symbol-mode t)
+
+(setq tags-revert-without-query 1)
 
 (global-set-key (kbd "s-`") 'avy-goto-word-or-subword-1)
 (global-set-key (kbd "s-a") 'helm-projectile-ag)
@@ -57,10 +62,11 @@
 (global-set-key (kbd "s-<f5>") 'revert-buffer)
 (global-set-key (kbd "s-n") 'xah-new-empty-buffer)
 (global-set-key (kbd "s-<f2>") 'rename-file-and-buffer)
-(global-set-key (kbd "s-I") 'utl-imenus-search-project-go-files)
-(global-set-key (kbd "s-i") 'imenus)
+(global-set-key (kbd "s-I") 'helm-etags-select)
+(global-set-key (kbd "s-i") 'imenu)
 (global-set-key (kbd "s-u") 'lower-and-concat)
 (global-set-key (kbd "s-q") 'er/expand-region)
+(global-set-key (kbd "M-s-l") 'magit-log-buffer-file)
 
 
 (global-set-key (kbd "C-c b") 'magit-blame)
@@ -151,9 +157,12 @@
 (load-file "~/.emacs.d/utils/buffer.el")
 (load-file "~/.emacs.d/utils/string.el")
 (load-file "~/.emacs.d/utils/golang.el")
+(load-file "~/.emacs.d/utils/gotests.el")
 
-(buffer-on-bottom-side "*go-guru-output*")
-(buffer-on-bottom-side "^\\*[^magit].+\\*$")
+(buffer-on-bottom-side "*go-guru-output*" "*Ediff Control Panel*" "^\\*[^magit].+\\*$")
+
+(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+(setq tags-add-tables nil)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -171,7 +180,7 @@
    (quote
     ("a11043406c7c4233bfd66498e83600f4109c83420714a2bd0cd131f81cbbacea" "780c67d3b58b524aa485a146ad9e837051918b722fd32fd1b7e50ec36d413e70" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
  '(flycheck-display-errors-delay 1.0)
- '(flycheck-go-build-executable "gb")
+ '(flycheck-go-build-executable "go")
  '(git-commit-summary-max-length 256)
  '(go-impl-aliases-alist
    (quote
@@ -180,9 +189,11 @@
      ("valid" . "types.Validatable")
      ("m" . "json.Marshaler")
      ("um" . "json.Unmarshaler"))))
+ '(go-test-case-command "gb test -v -test.short -test.run")
  '(golden-ratio-exclude-buffer-names (quote ("*compilation*")))
  '(golden-ratio-exclude-modes nil)
- '(helm-ag-base-command "ag -f --nocolor --nogroup")
+ '(helm-ag-base-command "ag --nocolor -f --nogroup")
+ '(helm-ag-command-option nil)
  '(highlight-symbol-idle-delay 0.3)
  '(inhibit-startup-screen t)
  '(interprogram-paste-function (quote x-cut-buffer-or-selection-value) t)
@@ -190,7 +201,7 @@
  '(json-reformat:pretty-string\? t)
  '(package-selected-packages
    (quote
-    (flycheck-pos-tip git-link browse-at-remote go-dlv go-stacktracer ac-helm ag anzu avy benchmark-init color-theme-modern drag-stuff elpy expand-region flycheck flycheck-tip flymake-json format-sql go-autocomplete go-direx go-eldoc go-guru go-impl go-projectile go-rename golden-ratio helm-ag helm-ag-r helm-go-package helm-projectile highlight-symbol howdoi imenus json-mode lua-mode magit move-text nodejs-repl swiper thing-cmds web-beautify web-mode yafolding yaml-mode yasnippet)))
+    (git-timemachine imenu-anywhere gotest projectile-ripgrep use-package flycheck-pos-tip git-link browse-at-remote go-dlv go-stacktracer ac-helm ag anzu avy benchmark-init color-theme-modern drag-stuff elpy expand-region flycheck flycheck-tip flymake-json format-sql go-autocomplete go-direx go-eldoc go-guru go-impl go-projectile go-rename golden-ratio helm-ag helm-ag-r helm-go-package helm-projectile highlight-symbol howdoi imenus json-mode lua-mode magit move-text nodejs-repl swiper thing-cmds web-beautify web-mode yafolding yaml-mode yasnippet)))
  '(scroll-conservatively 1000)
  '(scroll-margin 10)
  '(select-enable-clipboard t)

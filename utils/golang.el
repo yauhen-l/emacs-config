@@ -2,9 +2,15 @@
 ;;; Code:
 ;;; Commentary:
 
-(defvar init-GOPATH (getenv "GOPATH"))
+(defun find-not-suffix(l suffix)
+  (if (string-suffix-p (car l) suffix)
+      (find-not-suffix (cdr l) suffix)
+    (car l)))
+
+(defvar init-GOPATH (find-not-suffix (split-string (getenv "GOPATH") ":") "vendor"))
+
 (setq gofmt-command "goimports")
-(projectile-register-project-type 'go #'projectile-go "gb generate . && gb build" "gb test -test.short")
+(projectile-register-project-type 'go #'projectile-go "go generate && go generate -tags validators && gb build" "gb test -test.short")
 (require 'go-autocomplete)
 (require 'go-eldoc)
 ;(require 'go-complete)
@@ -19,7 +25,7 @@
 
 (flycheck-define-checker gb-test
   "A Go syntax and type checker using the `gb test' command."
-  :command ("gb" "test" "-test.short" "-test.run" "^$")
+  :command ("gb" "test" "." "-test.short" "-test.run" "^$")
   :error-patterns ((error line-start (file-name) ":" line ":" (message) line-end))
   :predicate (lambda ()
                (and (flycheck-buffer-saved-p)
@@ -30,11 +36,14 @@
 (add-to-list 'flycheck-checkers 'gb-test)
 (setq-default flycheck-disabled-checkers '(go-vet go-golint go-build))
 
-(add-to-list 'load-path "/home/yauhen/ws/golang/src/github.com/yauhenl/gotn/")
+(load-file "~/.emacs.d/utils/gotn.el")
+(load-file "~/.emacs.d/utils/gotests.el")
 (require 'gotn)
+(require 'gotests)
 
 (add-hook 'go-mode-hook (lambda ()
                           (add-hook 'before-save-hook 'gofmt-before-save)
+                          (add-hook 'after-save-hook 'go-generate-etags)
                           (local-set-key (kbd "C-c C-r") 'go-remove-unused-imports)
 													(local-set-key (kbd "C-c o") 'godoc-at-point)
 													(local-set-key (kbd "C-c r") 'go-run-file)
@@ -49,15 +58,16 @@
                           (go-eldoc-setup)
 													))
 
+(defun go-generate-etags()
+  (interactive)
+  (run-in-project-no-output (string-join (cons "tago" (list-project-go-files)) " ")))
+
 (defun go-package-name(file)
 	(replace-regexp-in-string (concat init-GOPATH "/src/") "" file))
 
 (defun go-test-package()
 	(interactive)
-  (let ((func-name (thing-at-point 'word)))
-    (shell-command
-     (concat "gb test -v" (if (= (length func-name) 0) "" (concat " -test.short -test.run ^" func-name "$"))))
-    ))
+    (shell-command "gb test . -v"))
 
 (defun gb-build-project()
 	(interactive)
@@ -100,13 +110,10 @@
 
 ;(go-juno-pkg-alias "junolab.net/lib_gis/api")
 
-(defun utl-imenus-search-project-go-files ()
-  "Perform `imenus' on Go files from `projectile-root-dir'."
-  (interactive)
-  (imenus-files
-   (directory-files-recursively (projectile-project-root) "^[^.].*\\.go\\'")))
-
-(defun go-import-add (arg import)
+(defun list-project-go-files()
+  (directory-files-recursively (projectile-project-root) "^[^.].*\\.go\\'"))
+ 
+(defun go-import-add1 (arg import)
   "Add a new IMPORT to the list of imports.
 
 When called with a prefix ARG asks for an alternative name to

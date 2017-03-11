@@ -41,6 +41,8 @@
 (require 'gotn)
 (require 'gotests)
 
+(require 'go-impl)
+
 (add-hook 'go-mode-hook (lambda ()
                           (add-hook 'before-save-hook 'gofmt-before-save)
                           (add-hook 'after-save-hook 'go-generate-etags)

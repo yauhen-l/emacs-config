@@ -5,8 +5,13 @@
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 (require 'package)
-(add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/"))
+(setq
+ package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
+                    ("org" . "http://orgmode.org/elpa/")
+                    ("melpa" . "http://melpa.org/packages/")
+                    ("melpa-stable" . "http://stable.melpa.org/packages/"))
+ package-archive-priorities '(("melpa-stable" . 1)))
+
 (when (< emacs-major-version 24)
   ;; For important compatibility libraries like cl-lib
   (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
@@ -14,6 +19,10 @@
 
 (require 'find-lisp)
 (require 'imenus)
+
+(use-package ensime
+  :ensure t
+  :pin melpa-stable)
 
 (defun run-in-project(command)
 	(interactive "s")
@@ -179,6 +188,9 @@
  '(custom-safe-themes
    (quote
     ("a11043406c7c4233bfd66498e83600f4109c83420714a2bd0cd131f81cbbacea" "780c67d3b58b524aa485a146ad9e837051918b722fd32fd1b7e50ec36d413e70" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
+ '(ensime-completion-style (quote company))
+ '(ensime-graphical-tooltips t)
+ '(ensime-use-helm t)
  '(flycheck-display-errors-delay 1.0)
  '(flycheck-go-build-executable "go")
  '(git-commit-summary-max-length 256)
@@ -189,7 +201,7 @@
      ("valid" . "types.Validatable")
      ("m" . "json.Marshaler")
      ("um" . "json.Unmarshaler"))))
- '(go-test-case-command "gb test -v -test.short -test.run")
+ '(go-test-case-command "gb test -v -test.run")
  '(golden-ratio-exclude-buffer-names (quote ("*compilation*")))
  '(golden-ratio-exclude-modes nil)
  '(helm-ag-base-command "ag --nocolor -f --nogroup")
@@ -201,7 +213,7 @@
  '(json-reformat:pretty-string\? t)
  '(package-selected-packages
    (quote
-    (git-timemachine imenu-anywhere gotest projectile-ripgrep use-package flycheck-pos-tip git-link browse-at-remote go-dlv go-stacktracer ac-helm ag anzu avy benchmark-init color-theme-modern drag-stuff elpy expand-region flycheck flycheck-tip flymake-json format-sql go-autocomplete go-direx go-eldoc go-guru go-impl go-projectile go-rename golden-ratio helm-ag helm-ag-r helm-go-package helm-projectile highlight-symbol howdoi imenus json-mode lua-mode magit move-text nodejs-repl swiper thing-cmds web-beautify web-mode yafolding yaml-mode yasnippet)))
+    (ac-helm ag anzu avy benchmark-init browse-at-remote color-theme-modern drag-stuff elpy ensime expand-region flycheck flycheck-pos-tip flycheck-scala-sbt flycheck-tip flymake-json format-sql git-link git-timemachine go-autocomplete go-direx go-dlv go-eldoc go-guru go-impl go-projectile go-rename go-stacktracer golden-ratio gotest helm-ag helm-ag-r helm-go-package helm-projectile highlight-symbol howdoi imenu-anywhere imenus json-mode lua-mode magit move-text nodejs-repl projectile-ripgrep swiper thing-cmds use-package web-beautify web-mode yafolding yaml-mode yasnippet)))
  '(scroll-conservatively 1000)
  '(scroll-margin 10)
  '(select-enable-clipboard t)

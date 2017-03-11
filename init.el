@@ -100,6 +100,7 @@
 (define-key ac-complete-mode-map (kbd "C-.") 'ac-complete-with-helm)
 
 (set-face-attribute 'eldoc-highlight-function-argument nil :underline nil :foreground "red" :weight 'bold)
+(set-face-attribute 'region nil :background "#BBB")
 
 (use-package flycheck
   :config
@@ -192,7 +193,7 @@
  '(ensime-graphical-tooltips t)
  '(ensime-use-helm t)
  '(flycheck-display-errors-delay 1.0)
- '(flycheck-go-build-executable "go")
+ '(flycheck-go-build-executable "gb")
  '(git-commit-summary-max-length 256)
  '(go-impl-aliases-alist
    (quote
@@ -204,8 +205,7 @@
  '(go-test-case-command "gb test -v -test.run")
  '(golden-ratio-exclude-buffer-names (quote ("*compilation*")))
  '(golden-ratio-exclude-modes nil)
- '(helm-ag-base-command "ag --nocolor -f --nogroup")
- '(helm-ag-command-option nil)
+ '(helm-ag-base-command "ag -f --nocolor --nogroup")
  '(highlight-symbol-idle-delay 0.3)
  '(inhibit-startup-screen t)
  '(interprogram-paste-function (quote x-cut-buffer-or-selection-value) t)
@@ -235,7 +235,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "DejaVu Sans Mono" :foundry "PfEd" :slant normal :weight normal :height 110 :width normal)))))
+ '(default ((t (:family "DejaVu Sans Mono" :foundry "PfEd" :slant normal :weight normal :height 110 :width normal))))
+ '(highlight-symbol-face ((t (:background "gainsboro")))))
 
 (provide 'init)
 ;;; init.el ends here

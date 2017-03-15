@@ -1,5 +1,10 @@
-!utils
-!init.el
-!gotmpl.go
-!.gitignore
-/*
+.python-environments
+ac-comphist.dat
+auto-save-list
+elpa
+projectile-bookmarks.eld
+projectile.cache
+semanticdb
+session.*
+tramp
+url

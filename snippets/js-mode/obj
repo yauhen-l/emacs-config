@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+#name : Obj
+# --
+{
+	"type": "object",
+	"properties": {
+		$0
+	},
+	"required": [],
+	"additionalProperties": false
+}

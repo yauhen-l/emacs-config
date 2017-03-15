@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+#name : Pr
+# --
+"$0": {
+	"type": "$1"
+}

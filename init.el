@@ -216,7 +216,8 @@
  '(sr-speedbar-right-side nil)
  '(sr-speedbar-width 20 t)
  '(tool-bar-mode nil)
- '(uniquify-buffer-name-style (quote forward) nil (uniquify)))
+ '(uniquify-buffer-name-style (quote forward) nil (uniquify))
+ '(yas-snippet-dirs (quote ("/home/yauhen/.emacs.d/snippets"))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

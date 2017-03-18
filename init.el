@@ -167,7 +167,6 @@
 (load-file "~/.emacs.d/utils/buffer.el")
 (load-file "~/.emacs.d/utils/string.el")
 (load-file "~/.emacs.d/utils/golang.el")
-(load-file "~/.emacs.d/utils/gotests.el")
 
 (buffer-on-bottom-side "*go-guru-output*" "*Ediff Control Panel*" "^\\*[^magit].+\\*$")
 
@@ -186,6 +185,10 @@
      ("gitlab.com" . "gitlab")
      ("git.junolab.net" . "github"))))
  '(column-number-mode t)
+ '(compilation-error-regexp-alist
+   (quote
+    (("\\([a-zA-Z0-9_]+\\.go\\):\\([0-9]+\\)" 1 2)
+     go-test absoft ada aix ant bash borland python-tracebacks-and-caml comma cucumber msft edg-1 edg-2 epc ftnchek iar ibm irix java jikes-file maven jikes-line gcc-include ruby-Test::Unit gnu lcc makepp mips-1 mips-2 msft omake oracle perl php rxp sparc-pascal-file sparc-pascal-line sparc-pascal-example sun sun-ada watcom 4bsd gcov-file gcov-header gcov-nomark gcov-called-line gcov-never-called perl--Pod::Checker perl--Test perl--Test2 perl--Test::Harness weblint guile-file guile-line)))
  '(custom-safe-themes
    (quote
     ("a11043406c7c4233bfd66498e83600f4109c83420714a2bd0cd131f81cbbacea" "780c67d3b58b524aa485a146ad9e837051918b722fd32fd1b7e50ec36d413e70" "d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" "8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
@@ -203,9 +206,9 @@
      ("m" . "json.Marshaler")
      ("um" . "json.Unmarshaler"))))
  '(go-test-case-command "gb test -v -test.run")
+ '(go-test-package-command "gb test -v")
  '(golden-ratio-exclude-buffer-names (quote ("*compilation*")))
  '(golden-ratio-exclude-modes nil)
- '(helm-ag-base-command "ag -f --nocolor --nogroup")
  '(highlight-symbol-idle-delay 0.3)
  '(inhibit-startup-screen t)
  '(interprogram-paste-function (quote x-cut-buffer-or-selection-value) t)
@@ -228,7 +231,10 @@
  '(sr-speedbar-right-side nil)
  '(sr-speedbar-width 20 t)
  '(tool-bar-mode nil)
- '(uniquify-buffer-name-style (quote forward) nil (uniquify)))
+ '(uniquify-buffer-name-style (quote forward) nil (uniquify))
+ '(yas-snippet-dirs
+   (quote
+    ("~/Misc/emacs/yasnippet-custom" "/home/yauhen/.emacs.d/snippets"))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

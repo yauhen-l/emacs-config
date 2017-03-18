@@ -39,7 +39,6 @@
 (load-file "~/.emacs.d/utils/gotn.el")
 (load-file "~/.emacs.d/utils/gotests.el")
 (require 'gotn)
-(require 'gotests)
 
 (require 'go-impl)
 

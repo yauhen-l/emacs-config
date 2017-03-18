@@ -1,0 +1,20 @@
+func ($1 *$2) Scan(value interface{}) (err error) {
+  if value == nil {
+     *$1 = $2{}
+     return nil
+  }
+
+  var x []byte
+
+	switch v := value.(type) {
+  case string:
+    x = []byte(v)
+	case []byte:
+    x = v
+	default:
+		return fmt.Errorf("not supported $2 type(%[0]T) and value(%[0]v)", v)
+	}
+
+  return json.Unmarshal(x, $1)
+}
+$0

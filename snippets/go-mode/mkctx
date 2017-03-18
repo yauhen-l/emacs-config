@@ -1,0 +1,2 @@
+ctx := ms_core.NewContext(types.NewId(), "", types.MsgMeta{}, "")
+$0

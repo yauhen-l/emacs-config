@@ -35,13 +35,13 @@
   (compilation-start cmd
                      'gotn-mode
                      'gotn--compilation-name))
-  
+
 
 (defun gotn-run-test-package ()
   "Run go test of current package."
   (interactive "d")
   (gotn--run-test-as-compilation go-test-package-command))
-  
+
 (defun gotn-run-test (point)
   "Run go test at POINT."
   (interactive "d")

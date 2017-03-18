@@ -1,0 +1,2 @@
+ctx.Logger().${1:level}("${2:%s}\n", ${3:args})
+$0

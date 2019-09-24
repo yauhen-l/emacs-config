@@ -161,7 +161,20 @@
   :ensure t
   :demand
   :after lsp
+	:init
+	(defvar yl/lsp-ui-doc-enabled nil)
+	(defun yl/lsp-ui-doc-toggle ()
+		"Toogles show of doc hover"
+		(interactive)
+		(if yl/lsp-ui-doc-enabled
+				(lsp-ui-doc-show)
+			(lsp-ui-doc-hide))
+		(setq yl/lsp-ui-doc-enabled (not yl/lsp-ui-doc-enabled)))
+	(require 'lsp-java-boot)
+	(add-hook 'lsp-mode-hook #'lsp-lens-mode)
+	(add-hook 'java-mode-hook #'lsp-java-boot-lens-mode)
   :bind (
+         ("C-c l q" . yl/lsp-ui-doc-toggle)
          ("C-c l b" . lsp-java-build-project)
          ("C-c l n" . lsp-java-actionable-notifications)
          ("C-c l c" . lsp-java-update-project-configuration)

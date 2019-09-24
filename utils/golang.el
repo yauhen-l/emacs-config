@@ -10,31 +10,31 @@
 (defvar init-GOPATH (find-not-suffix (split-string (getenv "GOPATH") ":") "vendor"))
 
 (setq gofmt-command "goimports")
-(projectile-register-project-type 'go #'projectile-go "go generate && go generate -tags validators && gb build" "gb test -test.short")
-(require 'go-autocomplete)
+;(projectile-register-project-type 'go #'projectile-go :compile "go build" :test "go test -v")
+;(require 'go-autocomplete)
 (require 'go-eldoc)
-;(require 'go-complete)
-;(add-hook 'completion-at-point-functions 'go-complete-at-point)
+(require 'go-complete)
+(add-hook 'completion-at-point-functions 'go-complete-at-point)
 ;(require 'go-mode-autoloads)
 (require 'flycheck)
-(flycheck-define-checker gb-build
-  "A Go syntax and type checker using the `gb build' command."
-  :command ("gb" "build")
-  :error-patterns ((error line-start (file-name) ":" line ":" (message) line-end))
-  :modes go-mode)
+;(flycheck-define-checker go-build
+;  "A Go syntax and type checker using the `go build' command."
+;  :command ("go" "build" "./...")
+;  :error-patterns ((error line-start (file-name) ":" line ":" (message) line-end))
+;  :modes go-mode)
 
-(flycheck-define-checker gb-test
-  "A Go syntax and type checker using the `gb test' command."
-  :command ("gb" "test" "." "-test.short" "-test.run" "^$")
+(flycheck-define-checker go-test
+  "A Go syntax and type checker using the `go test' command."
+  :command ("go" "test" "./...")
   :error-patterns ((error line-start (file-name) ":" line ":" (message) line-end))
   :predicate (lambda ()
                (and (flycheck-buffer-saved-p)
                     (string-suffix-p "_test.go" (buffer-file-name))))
   :modes go-mode)
 
-(add-to-list 'flycheck-checkers 'gb-build)
-(add-to-list 'flycheck-checkers 'gb-test)
-(setq-default flycheck-disabled-checkers '(go-vet go-golint go-build))
+;(add-to-list 'flycheck-checkers 'go-build)
+(add-to-list 'flycheck-checkers 'go-test)
+(setq-default flycheck-disabled-checkers '(go-vet go-golint))
 
 (load-file "~/.emacs.d/utils/gotn.el")
 (load-file "~/.emacs.d/utils/gotests.el")
@@ -46,56 +46,47 @@
                           (add-hook 'before-save-hook 'gofmt-before-save)
                           (add-hook 'after-save-hook 'go-generate-etags)
                           (local-set-key (kbd "C-c C-r") 'go-remove-unused-imports)
-													(local-set-key (kbd "C-c o") 'godoc-at-point)
-													(local-set-key (kbd "C-c r") 'go-run-file)
-													(local-set-key (kbd "C-c t") 'go-test-package)
-													(local-set-key (kbd "C-c C-t") 'gotn-run-test)
+                                                    (local-set-key (kbd "C-c o") 'godoc-at-point)
+                                                    (local-set-key (kbd "C-c r") 'go-run-file)
+                                                    (local-set-key (kbd "C-c t") 'go-test-package)
+                                                    (local-set-key (kbd "C-c C-t") 'gotn-run-test)
                           (local-set-key (kbd "<f5>") 'go-guru-describe)
                           (local-set-key (kbd "<f6>") 'go-guru-referrers)
-                          (local-set-key (kbd "C-c g u") 'goose-up-project)
-                          (local-set-key (kbd "C-c g d") 'goose-down-project)
                           (local-set-key (kbd "s-b") 'gb-build-project)
                           (go-guru-hl-identifier-mode)
                           (go-eldoc-setup)
-													))
+                                                    ))
 
 (defun go-generate-etags()
   (interactive)
   (run-in-project-no-output (string-join (cons "tago" (list-project-go-files)) " ")))
 
 (defun go-package-name(file)
-	(replace-regexp-in-string (concat init-GOPATH "/src/") "" file))
+    (replace-regexp-in-string (concat init-GOPATH "/src/") "" file))
 
 (defun go-test-package()
-	(interactive)
-    (shell-command "gb test . -v"))
+    (interactive)
+    (shell-command "go test . -v"))
 
 (defun gb-build-project()
-	(interactive)
-	(projectile-compile-project "gb build"))
-
-(defun goose-up-project()
-	(interactive)
-	(run-in-project "goose up"))
-
-(defun goose-down-project()
-	(interactive)
-	(run-in-project "goose down"))
+    (interactive)
+    (projectile-compile-project "go build ./..."))
 
 (defun go-run-file()
-	(interactive)
-	(shell-command (concat "go run " (buffer-file-name))))
+    (interactive)
+    (shell-command (concat "go run ." ;(buffer-file-name)
+                           )))
 
 (defun go-local-playground()
-	(interactive)
-	(let ((tmp-go-file (concat init-GOPATH
+    (interactive)
+    (let ((tmp-go-file (concat init-GOPATH
                              "/src/playground/"
-														 (replace-regexp-in-string "\\." "playground\/" (number-to-string (float-time)))
-														 ".go")))
-		(let ((dir (file-name-directory tmp-go-file)))
-			(make-directory dir)
-			(copy-file "~/.emacs.d/gotmpl.go" tmp-go-file)
-			(find-file tmp-go-file))))
+                                                         (replace-regexp-in-string "\\." "playground\/" (number-to-string (float-time)))
+                                                         ".go")))
+        (let ((dir (file-name-directory tmp-go-file)))
+            (make-directory dir)
+            (copy-file "~/.emacs.d/gotmpl.go" tmp-go-file)
+            (find-file tmp-go-file))))
 
 (defun go-juno-pkg-alias(url)
   (let ((import (split-string url "/"))

@@ -21,6 +21,31 @@
   (interactive)
   (mapc 'kill-buffer (buffer-list)))
 
+(defun toggle-window-split ()
+  (interactive)
+  (if (= (count-windows) 2)
+      (let* ((this-win-buffer (window-buffer))
+         (next-win-buffer (window-buffer (next-window)))
+         (this-win-edges (window-edges (selected-window)))
+         (next-win-edges (window-edges (next-window)))
+         (this-win-2nd (not (and (<= (car this-win-edges)
+                     (car next-win-edges))
+                     (<= (cadr this-win-edges)
+                     (cadr next-win-edges)))))
+         (splitter
+          (if (= (car this-win-edges)
+             (car (window-edges (next-window))))
+          'split-window-horizontally
+        'split-window-vertically)))
+    (delete-other-windows)
+    (let ((first-win (selected-window)))
+      (funcall splitter)
+      (if this-win-2nd (other-window 1))
+      (set-window-buffer (selected-window) this-win-buffer)
+      (set-window-buffer (next-window) next-win-buffer)
+      (select-window first-win)
+      (if this-win-2nd (other-window 1))))))
+
 ;; If emacs is run in a terminal, the clipboard- functions have no
 ;; effect. Instead, we use of xsel, see
 ;; http://www.vergenet.net/~conrad/software/xsel/ -- "a command-line
@@ -105,6 +130,36 @@ Version 2015-06-12"
     (funcall (and initial-major-mode))
     (setq buffer-offer-save t)))
 
+(defun xah-copy-file-path (&optional @dir-path-only-p)
+  "Copy the current buffer's file path or dired path to `kill-ring'.
+Result is full path.
+If `universal-argument' is called first, copy only the dir path.
+
+If in dired, copy the file/dir cursor is on, or marked files.
+
+If a buffer is not file and not dired, copy value of `default-directory' (which is usually the “current” dir when that buffer was created)
+
+URL `http://ergoemacs.org/emacs/emacs_copy_file_path.html'
+Version 2017-09-01"
+  (interactive "P")
+  (let (($fpath
+         (if (string-equal major-mode 'dired-mode)
+             (progn
+               (let (($result (mapconcat 'identity (dired-get-marked-files) "\n")))
+                 (if (equal (length $result) 0)
+                     (progn default-directory )
+                   (progn $result))))
+           (if (buffer-file-name)
+               (buffer-file-name)
+             (expand-file-name default-directory)))))
+    (kill-new
+     (if @dir-path-only-p
+         (progn
+           (message "Directory path copied: %s" (file-name-directory $fpath))
+           (file-name-directory $fpath))
+       (progn
+         (message "File path copied: %s" $fpath)
+         $fpath )))))
 
 (provide 'buffer-utils)
 ;;; buffer-utils.el ends here

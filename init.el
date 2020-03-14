@@ -69,8 +69,7 @@
 	helm-imenu-fuzzy-match t
 	helm-lisp-fuzzy-completion t
 	helm-locate-fuzzy-match t
-	helm-mode-fuzzy-match t
-    helm-left-margin-width 100)
+	helm-mode-fuzzy-match t)
   (helm-mode 1))
 
 (use-package helm-projectile
@@ -293,26 +292,29 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "DejaVu Sans Mono" :foundry "PfEd" :slant normal :weight normal :height 120 :width normal))))
+ '(default ((t (:family "DejaVu Sans Mono" :foundry "PfEd" :slant normal :weight normal :height 110 :width normal))))
  '(highlight-symbol-face ((t (:background "gainsboro"))))
  '(linum ((t (:inherit (shadow default)))))
  '(lsp-ui-sideline-code-action ((t (:foreground "grey")))))
  
- (custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ 
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(flycheck-display-errors-delay 0.3)
  '(golden-ratio-auto-scale t)
  '(golden-ratio-mode t)
  '(helm-use-frame-when-more-than-two-windows nil)
- '(yas-snippet-dirs (quote ("/home/yauhen/.emacs.d/snippets"))))
+ '(package-selected-packages
+   '(web-mode vc-msg uuidgen use-package typescript-mode thing-cmds syntax-subword smart-mode-line rainbow-delimiters py-autopep8 move-text meghanada markdown-preview-mode magit-popup magit lua-mode lsp-ui lsp-java kotlin-mode json-mode jedi java-snippets imenus highlight-symbol helm-projectile helm-ag-r helm-ag graphql-mode graphql gradle-mode gotest golden-ratio go-rename go-impl go-guru go-eldoc go-autocomplete gnu-elpa-keyring-update git-link ghub flycheck-scala-sbt flycheck-pos-tip flycheck-plantuml expand-region ensime drag-stuff docker-compose-mode dap-mode company-lsp company-emacs-eclim color-theme-modern browse-at-remote benchmark-init anzu ag ac-helm ac-emacs-eclim))
+ '(yas-snippet-dirs '("/home/yauhen/.emacs.d/snippets")))
   '(highlight-symbol-idle-delay 0.3)
   '(package-selected-packages
     (quote
     (toggle-window docker-compose-mode lsp-java treemacs-magit treemacs-icons-dired treemacs-projectile treemacs web-mode syntax-subword smart-mode-line flycheck-gradle ace-window dap-mode company-lsp yasnippet yaml-mode yafolding xml+ x-path-walker web-beautify use-package tldr tidy thing-cmds sql-indent smartparens realgud rainbow-delimiters py-autopep8 org-mind-map move-text markdown-preview-mode magit lua-mode lsp-ui jtags json-reformat jedi javadoc-lookup imenus highlight-symbol highlight helm-projectile helm-ag golden-ratio go-rename go-impl go-guru go-eldoc go-complete go-autocomplete ggtags flycheck-pos-tip flycheck-plantuml expand-region easy-hugo drag-stuff dockerfile-mode direx-grep company-jedi company-go color-theme-modern browse-at-remote avy autodisass-java-bytecode auto-sudoedit anzu ac-helm)))
- '(projectile-mode t nil (projectile)))
+ '(projectile-mode t nil (projectile))
   
 (provide 'init)
 ;;; init.el ends here

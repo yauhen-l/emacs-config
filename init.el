@@ -70,7 +70,7 @@
         helm-lisp-fuzzy-completion t
         helm-locate-fuzzy-match t
         helm-mode-fuzzy-match t
-        helm-left-margin-width 100)
+        helm-left-margin-width 0)
   (helm-mode 1))
 
 (use-package helm-projectile
@@ -242,16 +242,11 @@
 (use-package gotn
   :ensure t)
 
-;; (use-package golden-ratio
-;;   :ensure t
-;;   :config
-;;   (setq golden-ratio-auto-scale nil
-;;         golden-ratio-wide-adjust-factor 1
-;;         golden-ratio-auto-scale 1)
-;;   (define-advice select-window (:after (window &optional no-record) golden-ratio-resize-window)
-;;     (golden-ratio)
-;;     nil)
-;;   (golden-ratio-mode -1))
+(use-package golden-ratio
+  :ensure t
+  :config
+  (setq golden-ratio-auto-scale 1)
+  (golden-ratio-mode 1))
 
 (use-package dap-mode
   :ensure t :after lsp-mode
@@ -267,16 +262,7 @@
   (setq sml/no-confirm-load-theme t
         sml/theme 'light)
   (sml/setup))
- 
-(use-package rainbow-delimiters
-  :ensure t
-  :hook (prog-mode . rainbow-delimiters-mode)
-  :config
-  (setq rainbow-delimiters-max-face-count 5)
-  (set-face-attribute 'rainbow-delimiters-unmatched-face nil
-                      :foreground 'unspecified
-                      :inherit 'error))
- 
+
 (use-package syntax-subword
   :ensure t
   :init (global-syntax-subword-mode)
@@ -309,17 +295,6 @@
   :mode (("\\.text$" . markdown-mode)
          ("\\.markdown$" . markdown-mode)
          ("\\.md$" . markdown-mode)))
-
-;; (use-package smartparens
-;;   :ensure t
-;;   :diminish smartparens-mode
-;;   :init
-;;   (require 'smartparens-config)
-;;   (show-smartparens-global-mode t)
-;;   (smartparens-global-mode t)
-;;   (add-hook 'prog-mode-hook 'turn-on-smartparens-mode)
-;;   (sp-pair "\"" "\"" :actions '(wrap))
-;;   (sp-pair "'" "'" :actions '(wrap)))
  
 (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
  
@@ -393,8 +368,6 @@
      ("git.suckless.org" nil "git.suckless.org" forge-stagit-repository)
      ("git.sr.ht" nil "git.sr.ht" forge-srht-repository))))
  '(git-commit-summary-max-length 128)
- '(golden-ratio-auto-scale t)
- '(golden-ratio-mode t)
  '(helm-use-frame-when-more-than-two-windows nil)
  '(highlight-symbol-idle-delay 0.3)
  '(lsp-enable-file-watchers nil)

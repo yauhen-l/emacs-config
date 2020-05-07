@@ -62,14 +62,15 @@
 	 )
   :config
   (setq helm-M-x-fuzzy-match t
-	helm-apropos-fuzzy-match t
-	helm-buffers-fuzzy-matching t
-	helm-completion-in-region-fuzzy-match t
-	helm-etags-fuzzy-match t
-	helm-imenu-fuzzy-match t
-	helm-lisp-fuzzy-completion t
-	helm-locate-fuzzy-match t
-	helm-mode-fuzzy-match t)
+        helm-apropos-fuzzy-match t
+        helm-buffers-fuzzy-matching t
+        helm-completion-in-region-fuzzy-match t
+        helm-etags-fuzzy-match t
+        helm-imenu-fuzzy-match t
+        helm-lisp-fuzzy-completion t
+        helm-locate-fuzzy-match t
+        helm-mode-fuzzy-match t
+        helm-left-margin-width 0)
   (helm-mode 1))
 
 (use-package helm-projectile
@@ -124,23 +125,35 @@
   :ensure t
   :demand
   :config
-  (yas-minor-mode))
+  (yas-global-mode 1))
  
 (use-package lsp-mode
   :ensure t
   :bind (
-         ("C-c l d" . lsp-describe-thing-at-point)
-         ("C-c l r" . lsp-rename)
-         ("C-c l a" . lsp-execute-code-action)
+         ("C-c j d" . lsp-describe-thing-at-point)
+         ("C-c j r" . lsp-rename)
+         ("C-c j a" . lsp-execute-code-action)
          )
-  :hook ((nxml-mode . lsp)
+  :config
+  (setq lsp-clients-angular-language-server-command
+        '("node"
+          "/usr/local/lib/node_modules/@angular/language-server"
+          "--ngProbeLocations"
+          "/usr/local/lib/node_modules"
+          "--tsProbeLocations"
+          "/usr/local/lib/node_modules"
+          "--stdio"))
+  :hook ((typescript-mode . lsp)
+         (nxml-mode . lsp)
+         (java-mode . lsp)
          (go-mode . lsp))
   :init
   (setq lsp-prefer-flymake nil))
 
 (use-package helm-lsp
+  :ensure t
   :commands helm-lsp-workspace-symbol
-  :bind (("C-c l s" . helm-lsp-workspace-symbol)))
+  :bind (("C-c j s" . helm-lsp-workspace-symbol)))
 
 (use-package company
   :ensure t
@@ -171,9 +184,9 @@
 				(lsp-ui-doc-show)
 			(lsp-ui-doc-hide))
 		(setq yl/lsp-ui-doc-enabled (not yl/lsp-ui-doc-enabled)))
-	;;(require 'lsp-java-boot)
-	;;(add-hook 'lsp-mode-hook #'lsp-lens-mode)
-	;;(add-hook 'java-mode-hook #'lsp-java-boot-lens-mode)
+	(require 'lsp-java-boot)
+	(add-hook 'lsp-mode-hook #'lsp-lens-mode)
+	(add-hook 'java-mode-hook #'lsp-java-boot-lens-mode)
 
   (require 'projectile)
   (require 'files)
@@ -190,20 +203,24 @@
       (setq-default lsp-java-workspace-cache-dir (concat wp-dir ".cache"))
       (lsp t)))
 
-  (add-hook 'projectile-after-switch-project-hook #'yl/switch-jdt-workspace)
+  ;;(add-hook 'projectile-after-switch-project-hook #'yl/switch-jdt-workspace)
   
   :bind (
-         ("C-c l q" . yl/lsp-ui-doc-toggle)
-         ("C-c l b" . lsp-java-build-project)
-         ("C-c l n" . lsp-java-actionable-notifications)
-         ("C-c l c" . lsp-java-update-project-configuration)
-         ("C-c l g o" . lsp-java-generate-overrides)
-         ("C-c l g g" . lsp-java-generate-getters-and-setters)
-         ("C-c l g s" . lsp-java-generate-to-string)
-         ("C-c l o" . lsp-ui-imenu)
+         ("C-c j ?" . yl/lsp-ui-doc-toggle)
+         ("C-c j b" . lsp-java-build-project)
+         ("C-c j n" . lsp-java-actionable-notifications)
+         ("C-c j c" . lsp-java-update-project-configuration)
+         ("C-c j g o" . lsp-java-generate-overrides)
+         ("C-c j g g" . lsp-java-generate-getters-and-setters)
+         ("C-c j g s" . lsp-java-generate-to-string)
+         ("C-c j o" . helm-imenu)
          )
-  :hook (java-mode . lsp)
+  :hook ((java-mode . lsp))
   )
+
+(use-package which-key
+  :ensure t
+  :hook (lsp-mode . lsp-enable-which-key-integration))
 
 (use-package go-mode
   :ensure t
@@ -225,16 +242,11 @@
 ;; (use-package gotn
 ;;   :ensure t)
 
-;; (use-package golden-ratio
-;;   :ensure t
-;;   :config
-;;   (setq golden-ratio-auto-scale nil
-;;         golden-ratio-wide-adjust-factor 1
-;;         golden-ratio-auto-scale 1)
-;;   (define-advice select-window (:after (window &optional no-record) golden-ratio-resize-window)
-;;     (golden-ratio)
-;;     nil)
-;;   (golden-ratio-mode -1))
+(use-package golden-ratio
+  :ensure t
+  :config
+  (setq golden-ratio-auto-scale 1)
+  (golden-ratio-mode 1))
 
 (use-package dap-mode
   :ensure t :after lsp-mode
@@ -250,16 +262,7 @@
   (setq sml/no-confirm-load-theme t
         sml/theme 'light)
   (sml/setup))
- 
-(use-package rainbow-delimiters
-  :ensure t
-  :hook (prog-mode . rainbow-delimiters-mode)
-  :config
-  (setq rainbow-delimiters-max-face-count 5)
-  (set-face-attribute 'rainbow-delimiters-unmatched-face nil
-                      :foreground 'unspecified
-                      :inherit 'error))
- 
+
 (use-package syntax-subword
   :ensure t
   :init (global-syntax-subword-mode)
@@ -292,17 +295,6 @@
   :mode (("\\.text$" . markdown-mode)
          ("\\.markdown$" . markdown-mode)
          ("\\.md$" . markdown-mode)))
-
-;; (use-package smartparens
-;;   :ensure t
-;;   :diminish smartparens-mode
-;;   :init
-;;   (require 'smartparens-config)
-;;   (show-smartparens-global-mode t)
-;;   (smartparens-global-mode t)
-;;   (add-hook 'prog-mode-hook 'turn-on-smartparens-mode)
-;;   (sp-pair "\"" "\"" :actions '(wrap))
-;;   (sp-pair "'" "'" :actions '(wrap)))
  
 (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
  
@@ -377,13 +369,15 @@
      ("git.suckless.org" nil "git.suckless.org" forge-stagit-repository)
      ("git.sr.ht" nil "git.sr.ht" forge-srht-repository)))
  '(git-commit-summary-max-length 128)
- '(golden-ratio-auto-scale t)
- '(golden-ratio-mode t)
  '(helm-use-frame-when-more-than-two-windows nil)
  '(highlight-symbol-idle-delay 0.3)
  '(lsp-enable-file-watchers nil)
+ '(lsp-java-boot-enabled nil)
+ '(lsp-session-file "/home/yauhen/.emacs.d/.lsp-session-v2")
  '(package-selected-packages
-   '(forge gnu-elpa-keyring-update kotlin-mode csv csv-mode package-lint gotn gotest company-terraform terraform-mode toggle-window docker-compose-mode lsp-java treemacs-magit treemacs-icons-dired treemacs-projectile treemacs web-mode syntax-subword smart-mode-line flycheck-gradle ace-window dap-mode company-lsp yasnippet yaml-mode yafolding xml+ x-path-walker web-beautify use-package tldr tidy thing-cmds sql-indent smartparens realgud rainbow-delimiters py-autopep8 org-mind-map move-text markdown-preview-mode magit lua-mode lsp-ui jtags json-reformat jedi javadoc-lookup imenus highlight-symbol highlight helm-projectile helm-ag golden-ratio go-rename go-impl go-guru go-eldoc go-complete go-autocomplete ggtags flycheck-pos-tip flycheck-plantuml expand-region easy-hugo drag-stuff dockerfile-mode direx-grep company-jedi company-go color-theme-modern browse-at-remote avy autodisass-java-bytecode auto-sudoedit anzu ac-helm))
+   (quote
+    (helm-rg typescript-mode which-key helm-lsp forge gnu-elpa-keyring-update kotlin-mode csv csv-mode package-lint gotn gotest company-terraform terraform-mode toggle-window docker-compose-mode lsp-java treemacs-magit treemacs-icons-dired treemacs-projectile treemacs web-mode syntax-subword smart-mode-line flycheck-gradle ace-window dap-mode company-lsp yasnippet yaml-mode yafolding xml+ x-path-walker web-beautify use-package tldr tidy thing-cmds sql-indent smartparens realgud rainbow-delimiters py-autopep8 org-mind-map move-text markdown-preview-mode magit lua-mode lsp-ui jtags json-reformat jedi javadoc-lookup imenus highlight-symbol highlight helm-projectile helm-ag golden-ratio go-rename go-impl go-guru go-eldoc go-complete go-autocomplete ggtags flycheck-pos-tip flycheck-plantuml expand-region easy-hugo drag-stuff dockerfile-mode direx-grep company-jedi company-go color-theme-modern browse-at-remote avy autodisass-java-bytecode auto-sudoedit anzu ac-helm)))
+ '(projectile-git-submodule-command "")
  '(projectile-mode t nil (projectile))
  '(safe-local-variable-values
    '((eval when
@@ -412,9 +406,11 @@
             (make-local-variable 'package-build-archive-dir)
             (expand-file-name "../packages/"))
            (set
-            (make-local-variable 'package-build-recipes-dir)
-            default-directory))))
- '(yas-snippet-dirs '("/home/yauhen/.emacs.d/snippets")))
+            (make-local-variable
+             (quote package-build-recipes-dir))
+            default-directory)))))
+ '(typescript-indent-level 2)
+ '(yas-snippet-dirs (quote ("/home/yauhen/.emacs.d/snippets")))
   
 (provide 'init)
 ;;; init.el ends here

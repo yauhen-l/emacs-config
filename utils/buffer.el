@@ -127,7 +127,7 @@ Version 2015-06-12"
   (interactive)
   (let ((ubuf (generate-new-buffer "untitled")))
     (switch-to-buffer ubuf)
-    (funcall (and initial-major-mode))
+    ;(funcall (and initial-major-mode))
     (setq buffer-offer-save t)))
 
 (defun xah-copy-file-path (&optional @dir-path-only-p)

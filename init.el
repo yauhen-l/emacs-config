@@ -11,7 +11,7 @@
                      ("org" . "http://orgmode.org/elpa/")
                      ("melpa" . "http://melpa.org/packages/")
                      ("melpa-stable" . "http://stable.melpa.org/packages/"))
-  package-archive-priorities '(("melpa-stable" . 1)))
+  package-archive-priorities '(("melpa" . 1)))
  (package-initialize)
  
 (condition-case nil
@@ -138,7 +138,9 @@
   :init
   (setq lsp-prefer-flymake nil))
 
-(use-package helm-lsp :commands helm-lsp-workspace-symbol)
+(use-package helm-lsp
+  :commands helm-lsp-workspace-symbol
+  :bind (("C-c l s" . helm-lsp-workspace-symbol)))
 
 (use-package company
   :ensure t
@@ -160,15 +162,68 @@
   :ensure t
   :demand
   :after lsp
+	:config
+	(defvar yl/lsp-ui-doc-enabled nil)
+	(defun yl/lsp-ui-doc-toggle ()
+		"Toogles show of doc hover"
+		(interactive)
+		(if yl/lsp-ui-doc-enabled
+				(lsp-ui-doc-show)
+			(lsp-ui-doc-hide))
+		(setq yl/lsp-ui-doc-enabled (not yl/lsp-ui-doc-enabled)))
+	;;(require 'lsp-java-boot)
+	;;(add-hook 'lsp-mode-hook #'lsp-lens-mode)
+	;;(add-hook 'java-mode-hook #'lsp-java-boot-lens-mode)
+
+  (require 'projectile)
+  (require 'files)
+  (defun yl/determine-jdt-workspace (base-path)
+    "Find closest JDT workspace going from BASE-PATH up"
+    (let ((workspace-location (locate-dominating-file base-path "workspace/jdt.ls-java-project")))
+      (if (not workspace-location) nil
+        (concat workspace-location "workspace/"))))
+
+  (defun yl/switch-jdt-workspace ()
+    (interactive)
+    (let ((wp-dir (replace-regexp-in-string "~" (getenv "HOME") (yl/determine-jdt-workspace (projectile-project-root)))))
+      (setq-default lsp-java-workspace-dir wp-dir)
+      (setq-default lsp-java-workspace-cache-dir (concat wp-dir ".cache"))
+      (lsp t)))
+
+  (add-hook 'projectile-after-switch-project-hook #'yl/switch-jdt-workspace)
+  
   :bind (
+         ("C-c l q" . yl/lsp-ui-doc-toggle)
          ("C-c l b" . lsp-java-build-project)
          ("C-c l n" . lsp-java-actionable-notifications)
          ("C-c l c" . lsp-java-update-project-configuration)
          ("C-c l g o" . lsp-java-generate-overrides)
          ("C-c l g g" . lsp-java-generate-getters-and-setters)
          ("C-c l g s" . lsp-java-generate-to-string)
+         ("C-c l o" . lsp-ui-imenu)
          )
-  :hook (java-mode . lsp))
+  :hook (java-mode . lsp)
+  )
+
+(use-package go-mode
+  :ensure t
+  :config
+  (require 'lsp)
+  (defun yl/gofmt()
+    "Organize imports and format code"
+    (interactive)
+    (lsp-organize-imports)
+    (gofmt))
+  (add-hook 'go-mode-hook
+            (lambda ()
+              (local-set-key (kbd "C-c l f") #'yl/gofmt)
+              (local-set-key (kbd "C-c t") #'gotn-run-test)
+              (local-set-key (kbd "C-c C-t") #'gotn-run-test-package)
+              ))
+  :mode (("\\.go$"  . go-mode)))
+
+;; (use-package gotn
+;;   :ensure t)
 
 ;; (use-package golden-ratio
 ;;   :ensure t
@@ -255,10 +310,13 @@
   :ensure t)
  
 (load-file "~/.emacs.d/utils/buffer.el")
+(load-file "~/.emacs.d/treemacs.el")
  
 (global-set-key (kbd "M-q") 'er/expand-region)
 (global-set-key (kbd "s-?") 'xah-copy-file-path)
-(global-set-key (kbd "s-n") 'xah-new-empty-buffer)
+(global-set-key (kbd "<s-up>") 'previous-error)
+(global-set-key (kbd "<s-down>") 'next-error)
+(global-set-key (kbd "C-c n") 'xah-new-empty-buffer)
 (global-set-key (kbd "<M-up>") 'move-text-up)
 (global-set-key (kbd "<M-down>") 'move-text-down)
 (global-set-key (kbd "C-x C-k") 'kill-this-buffer)
@@ -292,29 +350,71 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "DejaVu Sans Mono" :foundry "PfEd" :slant normal :weight normal :height 110 :width normal))))
+ '(default ((t (:family "DejaVu Sans Mono" :foundry "PfEd" :slant normal :weight normal :height 120 :width normal))))
  '(highlight-symbol-face ((t (:background "gainsboro"))))
  '(linum ((t (:inherit (shadow default)))))
  '(lsp-ui-sideline-code-action ((t (:foreground "grey")))))
- 
  
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ediff-split-window-function 'split-window-horizontally)
  '(flycheck-display-errors-delay 0.3)
+ '(forge-alist
+   '(("github.com" "api.github.com" "github.com" forge-github-repository)
+     ("git.prod.infra.deposit" "git.prod.infra.deposit/api/v4" "git.prod.infra.deposit" forge-gitlab-repository)
+     ("gitlab.com" "gitlab.com/api/v4" "gitlab.com" forge-gitlab-repository)
+     ("salsa.debian.org" "salsa.debian.org/api/v4" "salsa.debian.org" forge-gitlab-repository)
+     ("framagit.org" "framagit.org/api/v4" "framagit.org" forge-gitlab-repository)
+     ("codeberg.org" "codeberg.org/api/v1" "codeberg.org" forge-gitea-repository)
+     ("code.orgmode.org" "code.orgmode.org/api/v1" "code.orgmode.org" forge-gogs-repository)
+     ("bitbucket.org" "api.bitbucket.org/2.0" "bitbucket.org" forge-bitbucket-repository)
+     ("git.savannah.gnu.org" nil "git.savannah.gnu.org" forge-cgit**-repository)
+     ("git.kernel.org" nil "git.kernel.org" forge-cgit-repository)
+     ("repo.or.cz" nil "repo.or.cz" forge-repoorcz-repository)
+     ("git.suckless.org" nil "git.suckless.org" forge-stagit-repository)
+     ("git.sr.ht" nil "git.sr.ht" forge-srht-repository)))
+ '(git-commit-summary-max-length 128)
  '(golden-ratio-auto-scale t)
  '(golden-ratio-mode t)
  '(helm-use-frame-when-more-than-two-windows nil)
+ '(highlight-symbol-idle-delay 0.3)
+ '(lsp-enable-file-watchers nil)
  '(package-selected-packages
-   '(web-mode vc-msg uuidgen use-package typescript-mode thing-cmds syntax-subword smart-mode-line rainbow-delimiters py-autopep8 move-text meghanada markdown-preview-mode magit-popup magit lua-mode lsp-ui lsp-java kotlin-mode json-mode jedi java-snippets imenus highlight-symbol helm-projectile helm-ag-r helm-ag graphql-mode graphql gradle-mode gotest golden-ratio go-rename go-impl go-guru go-eldoc go-autocomplete gnu-elpa-keyring-update git-link ghub flycheck-scala-sbt flycheck-pos-tip flycheck-plantuml expand-region ensime drag-stuff docker-compose-mode dap-mode company-lsp company-emacs-eclim color-theme-modern browse-at-remote benchmark-init anzu ag ac-helm ac-emacs-eclim))
- '(yas-snippet-dirs '("/home/yauhen/.emacs.d/snippets")))
-  '(highlight-symbol-idle-delay 0.3)
-  '(package-selected-packages
-    (quote
-    (toggle-window docker-compose-mode lsp-java treemacs-magit treemacs-icons-dired treemacs-projectile treemacs web-mode syntax-subword smart-mode-line flycheck-gradle ace-window dap-mode company-lsp yasnippet yaml-mode yafolding xml+ x-path-walker web-beautify use-package tldr tidy thing-cmds sql-indent smartparens realgud rainbow-delimiters py-autopep8 org-mind-map move-text markdown-preview-mode magit lua-mode lsp-ui jtags json-reformat jedi javadoc-lookup imenus highlight-symbol highlight helm-projectile helm-ag golden-ratio go-rename go-impl go-guru go-eldoc go-complete go-autocomplete ggtags flycheck-pos-tip flycheck-plantuml expand-region easy-hugo drag-stuff dockerfile-mode direx-grep company-jedi company-go color-theme-modern browse-at-remote avy autodisass-java-bytecode auto-sudoedit anzu ac-helm)))
+   '(forge gnu-elpa-keyring-update kotlin-mode csv csv-mode package-lint gotn gotest company-terraform terraform-mode toggle-window docker-compose-mode lsp-java treemacs-magit treemacs-icons-dired treemacs-projectile treemacs web-mode syntax-subword smart-mode-line flycheck-gradle ace-window dap-mode company-lsp yasnippet yaml-mode yafolding xml+ x-path-walker web-beautify use-package tldr tidy thing-cmds sql-indent smartparens realgud rainbow-delimiters py-autopep8 org-mind-map move-text markdown-preview-mode magit lua-mode lsp-ui jtags json-reformat jedi javadoc-lookup imenus highlight-symbol highlight helm-projectile helm-ag golden-ratio go-rename go-impl go-guru go-eldoc go-complete go-autocomplete ggtags flycheck-pos-tip flycheck-plantuml expand-region easy-hugo drag-stuff dockerfile-mode direx-grep company-jedi company-go color-theme-modern browse-at-remote avy autodisass-java-bytecode auto-sudoedit anzu ac-helm))
  '(projectile-mode t nil (projectile))
+ '(safe-local-variable-values
+   '((eval when
+           (and
+            (buffer-file-name)
+            (not
+             (file-directory-p
+              (buffer-file-name)))
+            (string-match-p "^[^.]"
+                            (buffer-file-name)))
+           (unless
+               (featurep 'package-build)
+             (let
+                 ((load-path
+                   (cons "../package-build" load-path)))
+               (require 'package-build)))
+           (unless
+               (derived-mode-p 'emacs-lisp-mode)
+             (emacs-lisp-mode))
+           (package-build-minor-mode)
+           (setq-local flycheck-checkers nil)
+           (set
+            (make-local-variable 'package-build-working-dir)
+            (expand-file-name "../working/"))
+           (set
+            (make-local-variable 'package-build-archive-dir)
+            (expand-file-name "../packages/"))
+           (set
+            (make-local-variable 'package-build-recipes-dir)
+            default-directory))))
+ '(yas-snippet-dirs '("/home/yauhen/.emacs.d/snippets")))
   
 (provide 'init)
 ;;; init.el ends here

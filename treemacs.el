@@ -8,7 +8,7 @@
     (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
   :config
   (progn
-    (setq treemacs-collapse-dirs                 (if treemacs-python-executable 3 0)
+    (setq treemacs-collapse-dirs                 0
           treemacs-deferred-git-apply-delay      0.5
           treemacs-display-in-side-window        t
           treemacs-eldoc-display                 t
@@ -68,10 +68,10 @@
   :after treemacs projectile
   :ensure t)
 
-(use-package treemacs-icons-dired
-  :after treemacs dired
-  :ensure t
-  :config (treemacs-icons-dired-mode))
+;; (use-package treemacs-icons-dired
+;;   :after treemacs dired
+;;   :ensure t
+;;   :config (treemacs-icons-dired-mode))
 
 (use-package treemacs-magit
   :after treemacs magit

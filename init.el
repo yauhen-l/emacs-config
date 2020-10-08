@@ -298,9 +298,12 @@
  
 (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
  
-(use-package docker-compose-mode
-  :ensure t)
- 
+(use-package keychain-environment
+  :ensure t
+  :demand
+  :config
+  (keychain-refresh-environment))
+
 (load-file "~/.emacs.d/utils/buffer.el")
 (load-file "~/.emacs.d/treemacs.el")
  
@@ -375,8 +378,7 @@
  '(lsp-java-boot-enabled nil)
  '(lsp-session-file "/home/yauhen/.emacs.d/.lsp-session-v2")
  '(package-selected-packages
-   (quote
-    (helm-rg typescript-mode which-key helm-lsp forge gnu-elpa-keyring-update kotlin-mode csv csv-mode package-lint gotn gotest company-terraform terraform-mode toggle-window docker-compose-mode lsp-java treemacs-magit treemacs-icons-dired treemacs-projectile treemacs web-mode syntax-subword smart-mode-line flycheck-gradle ace-window dap-mode company-lsp yasnippet yaml-mode yafolding xml+ x-path-walker web-beautify use-package tldr tidy thing-cmds sql-indent smartparens realgud rainbow-delimiters py-autopep8 org-mind-map move-text markdown-preview-mode magit lua-mode lsp-ui jtags json-reformat jedi javadoc-lookup imenus highlight-symbol highlight helm-projectile helm-ag golden-ratio go-rename go-impl go-guru go-eldoc go-complete go-autocomplete ggtags flycheck-pos-tip flycheck-plantuml expand-region easy-hugo drag-stuff dockerfile-mode direx-grep company-jedi company-go color-theme-modern browse-at-remote avy autodisass-java-bytecode auto-sudoedit anzu ac-helm)))
+   '(keychain-environment helm-rg typescript-mode which-key helm-lsp forge gnu-elpa-keyring-update kotlin-mode csv csv-mode package-lint gotn gotest company-terraform terraform-mode toggle-window docker-compose-mode lsp-java treemacs-magit treemacs-icons-dired treemacs-projectile treemacs web-mode syntax-subword smart-mode-line flycheck-gradle ace-window dap-mode company-lsp yasnippet yaml-mode yafolding xml+ x-path-walker web-beautify use-package tldr tidy thing-cmds sql-indent smartparens realgud rainbow-delimiters py-autopep8 org-mind-map move-text markdown-preview-mode magit lua-mode lsp-ui jtags json-reformat jedi javadoc-lookup imenus highlight-symbol highlight helm-projectile helm-ag golden-ratio go-rename go-impl go-guru go-eldoc go-complete go-autocomplete ggtags flycheck-pos-tip flycheck-plantuml expand-region easy-hugo drag-stuff dockerfile-mode direx-grep company-jedi company-go color-theme-modern browse-at-remote avy autodisass-java-bytecode auto-sudoedit anzu ac-helm))
  '(projectile-git-submodule-command "")
  '(projectile-mode t nil (projectile))
  '(safe-local-variable-values
@@ -406,8 +408,7 @@
             (make-local-variable 'package-build-archive-dir)
             (expand-file-name "../packages/"))
            (set
-            (make-local-variable
-             (quote package-build-recipes-dir))
+            (make-local-variable 'package-build-recipes-dir)
             default-directory)))))
  '(typescript-indent-level 2)
  '(yas-snippet-dirs (quote ("/home/yauhen/.emacs.d/snippets")))

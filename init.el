@@ -253,7 +253,7 @@
               (local-set-key (kbd "C-c C-t") #'gotn-run-test-package)
               ))
   :mode (("\\.go$"  . go-mode)))
-F
+
 (use-package gotn
   :ensure t)
 
@@ -310,6 +310,12 @@ F
          ("\\.md$" . markdown-mode)))
 
 (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+ 
+(use-package keychain-environment
+  :ensure t
+  :demand
+  :config
+  (keychain-refresh-environment))
 
 (load-file "~/.emacs.d/utils/buffer.el")
 (load-file "~/.emacs.d/utils/uuid.el")
@@ -329,6 +335,10 @@ F
   ;(bind-key* (kbd "C-c C-f") 'with-editor-finish)
   (bind-key (kbd "C-x |") 'toggle-window-split)
   )
+
+;(global-set-key (kbd "<s-up>") 'previous-error)
+;(global-set-key (kbd "<s-down>") 'next-error)
+;(global-set-key (kbd "C-c C-c") "\C-a\C- \C-n\M-w\C-y\C-p") ; duplicate line
 
 (use-package ispell
   :config
@@ -475,7 +485,6 @@ F
            (set
             (make-local-variable 'package-build-recipes-dir)
             default-directory))))
- '(tramp-verbose 2)
  '(typescript-indent-level 2)
  '(web-mode-enable-auto-indentation nil)
  '(yas-snippet-dirs '("/home/yauhen/.emacs.d/snippets")))

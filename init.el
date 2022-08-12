@@ -13,16 +13,16 @@
                      ("melpa-stable" . "http://stable.melpa.org/packages/"))
   package-archive-priorities '(("melpa" . 1)))
  (package-initialize)
- 
+
 (condition-case nil
     (require 'use-package)
   (file-error
    (package-refresh-contents)
    (package-install 'use-package)
    (require 'use-package)))
- 
+
 (defalias 'yes-or-no-p 'y-or-n-p)
- 
+
 (tool-bar-mode -1)
 (toggle-scroll-bar -1)
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
@@ -33,7 +33,7 @@
 (show-paren-mode)
 (load-theme 'emacs-nw t t)
 (enable-theme 'emacs-nw)
- 
+
 (setq make-backup-files nil)
 (setq auto-save-default nil)
 (setq-default tab-width 2)
@@ -41,25 +41,34 @@
 (setq inhibit-startup-screen t)
 (delete-selection-mode 1)
 
+(use-package crux
+  :ensure t
+  :bind (("C-c D" . crux-delete-file-and-buffer)
+         ("C-c N" . crux-cleanup-buffer-or-region)
+         ("C-c O" . crux-open-with)
+         ("C-c C-d" . crux-duplicate-current-line-or-region)
+         ("C-c S" . crux-find-shell-init-file))
+  )
+
 (use-package projectile
   :ensure t
   :bind-keymap ("C-c p" . projectile-command-map)
   :config
   (projectile-mode +1))
- 
+
 (use-package helm
   :ensure t
   :demand
   :bind (
-	 ("M-x" . helm-M-x)
-	 ("C-x C-f" . helm-find-files)
-	 ("s-h" . helm-resume)
-	 ("s-I" . helm-etags-select)
-	 ("C-c F" . (lambda()
+   ("M-x" . helm-M-x)
+   ("C-x C-f" . helm-find-files)
+   ("s-h" . helm-resume)
+   ("s-I" . helm-etags-select)
+   ("C-c F" . (lambda()
                       (interactive)
                       (helm-do-ag "/home/yauhen/ws")))
-	 ("C-c f" . helm-do-ag)
-	 )
+   ("C-c f" . helm-do-ag)
+   )
   :config
   (setq helm-M-x-fuzzy-match t
         helm-apropos-fuzzy-match t
@@ -78,7 +87,7 @@
   :config
   (helm-projectile-on)
   :after (helm projectile))
- 
+
  (use-package highlight-symbol
    :bind
   ("C-x n" . highlight-symbol-next)
@@ -89,7 +98,7 @@
 (use-package magit
   :ensure t
   :bind (("C-c g b" . magit-blame-addition)
-	       ("C-c g s" . magit-status)
+         ("C-c g s" . magit-status)
          ("C-c g l" . magit-log-buffer-file)))
 (use-package browse-at-remote
   :bind (("C-c g r" . browse-at-remote)))
@@ -106,7 +115,7 @@
   :ensure t
   :bind (("C-x o" . ace-window)
          ("C-c k" . ace-delete-window)))
- 
+
 (use-package flycheck
   :ensure t
   :bind (("M-n" . flycheck-next-error)
@@ -115,18 +124,18 @@
   ;(set-face-attribute 'flycheck-error nil :underline (list :color "red" :style 'wave) :foreground nil :background nil)
   ;(set-face-attribute 'flycheck-warning nil :underline (list :color "yellow" :style 'wave) :background nil :foreground nil))
   (global-flycheck-mode t))
- 
+
 (use-package flycheck-pos-tip
   :ensure t
   :init
   (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
- 
+
 (use-package yasnippet
   :ensure t
   :demand
   :config
   (yas-global-mode 1))
- 
+
 (use-package lsp-mode
   :ensure t
   :bind (
@@ -158,10 +167,10 @@
 (use-package company
   :ensure t
   :config (global-company-mode t))
- 
+
 (use-package company-lsp
   :ensure t)
- 
+
 (use-package lsp-ui :ensure t
   :config
   (setq lsp-ui-doc-enable nil
@@ -175,18 +184,18 @@
   :ensure t
   :demand
   :after lsp
-	:config
-	(defvar yl/lsp-ui-doc-enabled nil)
-	(defun yl/lsp-ui-doc-toggle ()
-		"Toogles show of doc hover"
-		(interactive)
-		(if yl/lsp-ui-doc-enabled
-				(lsp-ui-doc-show)
-			(lsp-ui-doc-hide))
-		(setq yl/lsp-ui-doc-enabled (not yl/lsp-ui-doc-enabled)))
-	(require 'lsp-java-boot)
-	(add-hook 'lsp-mode-hook #'lsp-lens-mode)
-	(add-hook 'java-mode-hook #'lsp-java-boot-lens-mode)
+  :config
+  (defvar yl/lsp-ui-doc-enabled nil)
+  (defun yl/lsp-ui-doc-toggle ()
+    "Toogles show of doc hover"
+    (interactive)
+    (if yl/lsp-ui-doc-enabled
+        (lsp-ui-doc-show)
+      (lsp-ui-doc-hide))
+    (setq yl/lsp-ui-doc-enabled (not yl/lsp-ui-doc-enabled)))
+  (require 'lsp-java-boot)
+  (add-hook 'lsp-mode-hook #'lsp-lens-mode)
+  (add-hook 'java-mode-hook #'lsp-java-boot-lens-mode)
 
   (require 'projectile)
   (require 'files)
@@ -202,11 +211,15 @@
       (setq-default lsp-java-workspace-dir wp-dir)
       (setq-default lsp-java-workspace-cache-dir (concat wp-dir ".cache"))
       (lsp t)))
+  (defun yl/mvn-format ()
+    (interactive)
+    (projectile-run-shell-command-in-root "mvn fmt:format"))
 
   ;;(add-hook 'projectile-after-switch-project-hook #'yl/switch-jdt-workspace)
-  
+
   :bind (
          ("C-c j ?" . yl/lsp-ui-doc-toggle)
+         ("C-c j f" . yl/mvn-format)
          ("C-c j b" . lsp-java-build-project)
          ("C-c j n" . lsp-java-actionable-notifications)
          ("C-c j c" . lsp-java-update-project-configuration)
@@ -214,12 +227,14 @@
          ("C-c j g g" . lsp-java-generate-getters-and-setters)
          ("C-c j g s" . lsp-java-generate-to-string)
          ("C-c j o" . helm-imenu)
+         ("C-c o" . lsp-ui-imenu)
          )
   :hook ((java-mode . lsp))
   )
 
 (use-package which-key
   :ensure t
+  :config (which-key-mode)
   :hook (lsp-mode . lsp-enable-which-key-integration))
 
 (use-package go-mode
@@ -238,7 +253,7 @@
               (local-set-key (kbd "C-c C-t") #'gotn-run-test-package)
               ))
   :mode (("\\.go$"  . go-mode)))
-
+F
 (use-package gotn
   :ensure t)
 
@@ -250,12 +265,10 @@
 
 (use-package dap-mode
   :ensure t :after lsp-mode
-  :config
-  (dap-mode t)
-  (dap-ui-mode t))
- 
+  :config (dap-auto-configure-mode))
+
 (use-package dap-java :after (lsp-java))
- 
+
 (use-package smart-mode-line
   :ensure t
   :init
@@ -295,24 +308,28 @@
   :mode (("\\.text$" . markdown-mode)
          ("\\.markdown$" . markdown-mode)
          ("\\.md$" . markdown-mode)))
- 
+
 (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
- 
-(use-package docker-compose-mode
-  :ensure t)
- 
+
 (load-file "~/.emacs.d/utils/buffer.el")
+(load-file "~/.emacs.d/utils/uuid.el")
+
 (load-file "~/.emacs.d/treemacs.el")
- 
-(global-set-key (kbd "M-q") 'er/expand-region)
-(global-set-key (kbd "s-?") 'xah-copy-file-path)
-(global-set-key (kbd "C-c n") 'xah-new-empty-buffer)
-(global-set-key (kbd "<M-up>") 'move-text-up)
-(global-set-key (kbd "<M-down>") 'move-text-down)
-(global-set-key (kbd "C-x C-k") 'kill-this-buffer)
-(global-set-key (kbd "C-c C-c") "\C-a\C- \C-n\M-w\C-y\C-p") ; duplicate line
-(global-set-key (kbd "C-x |") 'toggle-window-split)
- 
+
+(use-package bind-key
+  :ensure  t
+  :demand
+  :config
+  (bind-key (kbd "M-q") 'er/expand-region)
+  (bind-key (kbd "s-?") 'xah-copy-file-path)
+  (bind-key (kbd "C-c n") 'xah-new-empty-buffer)
+  (bind-key (kbd "<M-up>") 'move-text-up)
+  (bind-key (kbd "<M-down>") 'move-text-down)
+  (bind-key (kbd "C-x C-k") 'kill-this-buffer)
+  ;(bind-key* (kbd "C-c C-f") 'with-editor-finish)
+  (bind-key (kbd "C-x |") 'toggle-window-split)
+  )
+
 (use-package ispell
   :config
   (add-to-list
@@ -332,9 +349,34 @@
       (ispell-change-dictionary new)
       (message "Switched dictionary from %s to %s" dict new)))
   :bind (("C-c d" . switch-dictionary-de-en))
-)
+  )
 
- 
+(use-package keychain-environment
+  :ensure t
+  :demand
+  :config
+  (keychain-refresh-environment))
+
+(use-package load-env-vars
+  :ensure t)
+
+(require 'ansi-color)
+(defun endless/colorize-compilation ()
+  "Colorize from `compilation-filter-start' to `point'."
+  (let ((inhibit-read-only t))
+    (ansi-color-apply-on-region
+     compilation-filter-start (point))))
+
+(add-hook 'compilation-filter-hook
+          #'endless/colorize-compilation)
+
+(defun er-auto-create-missing-dirs ()
+  (let ((target-dir (file-name-directory buffer-file-name)))
+    (unless (file-exists-p target-dir)
+      (make-directory target-dir t))))
+
+(add-to-list 'find-file-not-found-functions #'er-auto-create-missing-dirs)
+
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -344,17 +386,29 @@
  '(highlight-symbol-face ((t (:background "gainsboro"))))
  '(linum ((t (:inherit (shadow default)))))
  '(lsp-ui-sideline-code-action ((t (:foreground "grey")))))
- 
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ediff-split-window-function (quote split-window-horizontally))
+ '(auth-source-save-behavior nil)
+ '(browse-at-remote-remote-type-regexps
+   '(("^github\\.com$" . "github")
+     ("^bitbucket\\.org$" . "bitbucket")
+     ("^gitlab\\.com$" . "gitlab")
+     ("^git\\.savannah\\.gnu\\.org$" . "gnu")
+     ("^gist\\.github\\.com$" . "gist")
+     ("^git\\.sr\\.ht$" . "sourcehut")
+     ("^.*\\.visualstudio\\.com$" . "ado")
+     ("^pagure\\.io$" . "pagure")
+     ("^.*\\.fedoraproject\\.org$" . "pagure")
+     ("^.*\\.googlesource\\.com$" . "gitiles")
+     ("git\\.prod\\.infra\\.deposit" . "gitlab")))
+ '(ediff-split-window-function 'split-window-horizontally)
  '(flycheck-display-errors-delay 0.3)
  '(forge-alist
-   (quote
-    (("github.com" "api.github.com" "github.com" forge-github-repository)
+   '(("github.com" "api.github.com" "github.com" forge-github-repository)
      ("git.prod.infra.deposit" "git.prod.infra.deposit/api/v4" "git.prod.infra.deposit" forge-gitlab-repository)
      ("gitlab.com" "gitlab.com/api/v4" "gitlab.com" forge-gitlab-repository)
      ("salsa.debian.org" "salsa.debian.org/api/v4" "salsa.debian.org" forge-gitlab-repository)
@@ -366,21 +420,34 @@
      ("git.kernel.org" nil "git.kernel.org" forge-cgit-repository)
      ("repo.or.cz" nil "repo.or.cz" forge-repoorcz-repository)
      ("git.suckless.org" nil "git.suckless.org" forge-stagit-repository)
-     ("git.sr.ht" nil "git.sr.ht" forge-srht-repository))))
+     ("git.sr.ht" nil "git.sr.ht" forge-srht-repository)))
  '(git-commit-summary-max-length 128)
+ '(helm-projectile-truncate-lines nil)
  '(helm-use-frame-when-more-than-two-windows nil)
  '(highlight-symbol-idle-delay 0.3)
  '(lsp-enable-file-watchers nil)
  '(lsp-java-boot-enabled nil)
+ '(lsp-java-configuration-runtimes [])
+ '(lsp-java-format-comments-enabled nil)
+ '(lsp-java-format-enabled nil)
+ '(lsp-java-format-on-type-enabled nil)
+ '(lsp-java-java-path
+   "/home/yauhen/.sdkman/candidates/java/11.0.12-open/bin/java")
+ '(lsp-java-jdt-download-url
+   "https://download.eclipse.org/jdtls/milestones/1.9.0/jdt-language-server-1.9.0-202203031534.tar.gz")
+ '(lsp-java-vmargs
+   '("-XX:+UseParallelGC" "-XX:GCTimeRatio=4" "-XX:AdaptiveSizePolicyWeight=90" "-Dsun.zip.disableMemoryMapping=true" "-Xmx3G" "-Xms100m" "-javaagent:/home/yauhen/.m2/repository/org/projectlombok/lombok/1.18.8/lombok-1.18.8.jar"))
  '(lsp-session-file "/home/yauhen/.emacs.d/.lsp-session-v2")
  '(package-selected-packages
-   (quote
-    (helm-rg typescript-mode which-key helm-lsp forge gnu-elpa-keyring-update kotlin-mode csv csv-mode package-lint gotn gotest company-terraform terraform-mode toggle-window docker-compose-mode lsp-java treemacs-magit treemacs-icons-dired treemacs-projectile treemacs web-mode syntax-subword smart-mode-line flycheck-gradle ace-window dap-mode company-lsp yasnippet yaml-mode yafolding xml+ x-path-walker web-beautify use-package tldr tidy thing-cmds sql-indent smartparens realgud rainbow-delimiters py-autopep8 org-mind-map move-text markdown-preview-mode magit lua-mode lsp-ui jtags json-reformat jedi javadoc-lookup imenus highlight-symbol highlight helm-projectile helm-ag golden-ratio go-rename go-impl go-guru go-eldoc go-complete go-autocomplete ggtags flycheck-pos-tip flycheck-plantuml expand-region easy-hugo drag-stuff dockerfile-mode direx-grep company-jedi company-go color-theme-modern browse-at-remote avy autodisass-java-bytecode auto-sudoedit anzu ac-helm)))
+   '(load-env-vars kubernetes kubernetes-helm kubernetes-tramp docker-tramp keychain-environment crux helm-rg typescript-mode which-key helm-lsp forge gnu-elpa-keyring-update kotlin-mode csv csv-mode package-lint gotn gotest company-terraform terraform-mode toggle-window docker-compose-mode lsp-java treemacs-magit treemacs-icons-dired treemacs-projectile treemacs web-mode syntax-subword smart-mode-line flycheck-gradle ace-window dap-mode company-lsp yasnippet yaml-mode yafolding xml+ x-path-walker web-beautify use-package tldr tidy thing-cmds sql-indent smartparens realgud rainbow-delimiters py-autopep8 org-mind-map move-text markdown-preview-mode magit lua-mode lsp-ui jtags json-reformat jedi javadoc-lookup imenus highlight-symbol highlight helm-projectile helm-ag golden-ratio go-rename go-impl go-guru go-eldoc go-complete go-autocomplete ggtags flycheck-pos-tip flycheck-plantuml expand-region easy-hugo drag-stuff dockerfile-mode direx-grep company-jedi company-go color-theme-modern browse-at-remote avy autodisass-java-bytecode auto-sudoedit anzu ac-helm))
+ '(plantuml-default-exec-mode 'jar)
+ '(plantuml-executable-path "plantuml")
+ '(plantuml-jar-path "/home/yauhen/tools/plantuml/plantuml.jar")
  '(projectile-git-submodule-command "")
+ '(projectile-globally-ignored-files '("TAGS" "*.iml"))
  '(projectile-mode t nil (projectile))
  '(safe-local-variable-values
-   (quote
-    ((eval when
+   '((eval when
            (and
             (buffer-file-name)
             (not
@@ -389,33 +456,29 @@
             (string-match-p "^[^.]"
                             (buffer-file-name)))
            (unless
-               (featurep
-                (quote package-build))
+               (featurep 'package-build)
              (let
                  ((load-path
                    (cons "../package-build" load-path)))
-               (require
-                (quote package-build))))
+               (require 'package-build)))
            (unless
-               (derived-mode-p
-                (quote emacs-lisp-mode))
+               (derived-mode-p 'emacs-lisp-mode)
              (emacs-lisp-mode))
            (package-build-minor-mode)
            (setq-local flycheck-checkers nil)
            (set
-            (make-local-variable
-             (quote package-build-working-dir))
+            (make-local-variable 'package-build-working-dir)
             (expand-file-name "../working/"))
            (set
-            (make-local-variable
-             (quote package-build-archive-dir))
+            (make-local-variable 'package-build-archive-dir)
             (expand-file-name "../packages/"))
            (set
-            (make-local-variable
-             (quote package-build-recipes-dir))
-            default-directory)))))
+            (make-local-variable 'package-build-recipes-dir)
+            default-directory))))
+ '(tramp-verbose 2)
  '(typescript-indent-level 2)
- '(yas-snippet-dirs (quote ("/home/yauhen/.emacs.d/snippets"))))
-  
+ '(web-mode-enable-auto-indentation nil)
+ '(yas-snippet-dirs '("/home/yauhen/.emacs.d/snippets")))
+
 (provide 'init)
 ;;; init.el ends here

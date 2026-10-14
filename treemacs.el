@@ -40,14 +40,13 @@
           treemacs-space-between-root-nodes      t
           treemacs-tag-follow-cleanup            t
           treemacs-tag-follow-delay              1.5
-          treemacs-width                         35)
+          treemacs-width                         50)
 
     ;; The default width and height of the icons is 22 pixels. If you are
     ;; using a Hi-DPI display, uncomment this to double the icon size.
     ;;(treemacs-resize-icons 44)
 
-    (treemacs-follow-mode t)
-    (treemacs-filewatch-mode t)
+    (treemacs-project-follow-mode t)
     (treemacs-fringe-indicator-mode t)
     (pcase (cons (not (null (executable-find "git")))
                  (not (null treemacs-python-executable)))
@@ -77,7 +76,10 @@
   :after treemacs magit
   :ensure t)
 
-(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+(use-package lsp-treemacs
+  :commands lsp-treemacs-errors-list
+  :config
+  (lsp-treemacs-sync-mode 1))
 
 (provide 'treemacs)
 ;;; treemacs.el ends here
